@@ -1,0 +1,1 @@
+- [Bayzati product direction](bayzati-product-direction.md) — build around one trusted UAE financial data layer that powers the calendar, goals, forecasts, and future chat.
