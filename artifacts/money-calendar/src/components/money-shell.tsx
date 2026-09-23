@@ -1,11 +1,12 @@
 import type { ReactNode } from 'react';
-import { BarChart3, CalendarDays, ChevronRight, Home, Landmark, ShieldCheck } from 'lucide-react';
+import { BarChart3, BookOpen, CalendarDays, ChevronRight, Home, ShieldCheck, Target } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 
 const navItems = [
-  { href: '/', label: 'Money calendar', icon: CalendarDays },
-  { href: '/loan', label: 'Can I borrow?', icon: Landmark },
-  { href: '/home', label: 'Rent or buy?', icon: Home },
+  { href: '/home', label: 'Home', icon: Home },
+  { href: '/', label: 'Plan', icon: CalendarDays },
+  { href: '/goals', label: 'Goals', icon: Target },
+  { href: '/learn', label: 'Learn', icon: BookOpen },
 ];
 
 export function MoneyShell({ children }: { children: ReactNode }) {
@@ -18,11 +19,11 @@ export function MoneyShell({ children }: { children: ReactNode }) {
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-[252px] flex-col bg-sidebar px-5 py-6 text-sidebar-foreground md:flex">
         <Link href="/" className="mb-12 flex items-center gap-3" data-testid="link-brand">
           <span className="grid size-10 place-items-center rounded-[13px] bg-sidebar-primary text-sidebar-primary-foreground shadow-sm">
-            <span className="font-display text-2xl leading-none">M</span>
+            <img src="/images/bayzati-logo.png" alt="Bayzati" className="size-8 object-contain" data-testid="img-shell-bayzati-logo" />
           </span>
           <span>
-            <span className="block font-display text-[25px] leading-none tracking-tight">Money Calendar</span>
-            <span className="mt-1 block font-mono-data text-[9px] uppercase tracking-[0.18em] text-sidebar-foreground/55">A calmer yes</span>
+            <span className="block font-display text-[27px] leading-none tracking-tight">bayzati</span>
+            <span className="mt-1 block font-mono-data text-[9px] uppercase tracking-[0.18em] text-sidebar-foreground/55">your calmer money plan</span>
           </span>
         </Link>
         <nav className="space-y-1" aria-label="Main navigation">
@@ -62,8 +63,8 @@ export function MoneyShell({ children }: { children: ReactNode }) {
       <div className="md:pl-[252px]">
         <header className="sticky top-0 z-30 flex h-[68px] items-center justify-between border-b border-border/75 bg-background/90 px-5 backdrop-blur-md md:px-10">
           <div className="flex items-center gap-3 md:hidden">
-            <span className="grid size-8 place-items-center rounded-lg bg-primary text-primary-foreground font-display text-lg">M</span>
-            <span className="font-display text-xl">Money Calendar</span>
+            <span className="grid size-8 place-items-center rounded-lg bg-primary text-primary-foreground"><img src="/images/bayzati-logo.png" alt="Bayzati" className="size-7 object-contain" data-testid="img-mobile-bayzati-logo" /></span>
+            <span className="font-display text-xl">bayzati</span>
           </div>
           <div className="hidden items-center gap-2 text-xs text-muted-foreground md:flex">
             <BarChart3 className="size-4 text-primary" />
