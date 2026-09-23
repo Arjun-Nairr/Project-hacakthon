@@ -26,7 +26,7 @@ export function BayzatiMobileShell({
   children,
   floatingAction,
 }: {
-  active: 'plan' | 'goals' | 'learn';
+  active: 'home' | 'plan' | 'goals' | 'learn';
   children: ReactNode;
   floatingAction?: ReactNode;
 }) {
