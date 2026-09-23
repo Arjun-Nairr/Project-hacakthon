@@ -1,0 +1,935 @@
+BAYZATI — UI/UX STYLE GUIDELINES
+
+PRODUCT
+Bayzati is CBI UAE's modern financial planning and financial literacy application.
+
+The product helps users understand their money, plan spending, build savings goals, improve financial habits, and learn financial concepts through simple personalized guidance.
+
+The experience should feel like:
+MODERN FINTECH + TRUSTED BANK + PERSONAL FINANCIAL COACH
+
+It should NOT look like a traditional banking portal, accounting system, corporate dashboard, or children's educational app.
+
+
+────────────────────────────────────
+1. BRAND PERSONALITY
+────────────────────────────────────
+
+Bayzati should feel:
+
+• Modern
+• Intelligent
+• Trustworthy
+• Calm
+• Friendly
+• Premium
+• Simple
+• Encouraging
+• Financially empowering
+• UAE-focused
+• Young, but not childish
+
+The user should feel that financial planning has become easier and less intimidating.
+
+Avoid:
+• Corporate banking clutter
+• Excessive financial jargon
+• Overly playful/gamified visuals
+• Neon fintech aesthetics
+• Crypto-style interfaces
+• Excessive gradients
+• Excessive shadows
+• Glassmorphism
+• Dense dashboards
+
+
+────────────────────────────────────
+2. BRAND COLORS
+────────────────────────────────────
+
+PRIMARY
+
+Bayzati Navy
+#003B73
+
+Use for:
+• Primary buttons
+• Navigation
+• Major headings
+• Important financial figures
+• Active navigation states
+• Primary icons
+
+
+Bayzati Blue
+#139BE8
+
+Use for:
+• Interactive elements
+• Progress
+• Secondary charts
+• Links
+• Selected states
+• Financial insights
+
+
+Bayzati Magenta
+#D20A58
+
+Use as an ACCENT.
+
+Use for:
+• AI features
+• Important highlights
+• Selected insights
+• Small branded details
+• Goal milestones
+• Notification indicators
+
+Do NOT overuse magenta.
+
+
+────────────────────────────────────
+3. NEUTRAL COLORS
+────────────────────────────────────
+
+App Background
+#F8FAFC
+
+Card / Surface
+#FFFFFF
+
+Primary Text
+#17212B
+
+Secondary Text
+#667085
+
+Muted Text
+#98A2B3
+
+Borders
+#E4E7EC
+
+Subtle Background
+#F2F4F7
+
+Deep Navy
+#002E5D
+
+
+────────────────────────────────────
+4. FUNCTIONAL COLORS
+────────────────────────────────────
+
+Success
+#12A66A
+
+Warning
+#F5A623
+
+Error
+#D92D20
+
+IMPORTANT:
+
+Do not use red simply because money was spent.
+
+Spending is normal.
+
+Use red only when:
+• Budget exceeded
+• Payment problem
+• Critical warning
+• Negative financial condition
+
+Use green for:
+• Goal completed
+• Saving progress
+• Positive cash flow
+• Financial improvement
+
+
+────────────────────────────────────
+5. BRAND GRADIENT
+────────────────────────────────────
+
+Primary Bayzati gradient:
+
+linear-gradient(
+  135deg,
+  #003B73 0%,
+  #139BE8 52%,
+  #D20A58 100%
+)
+
+Use sparingly.
+
+Suitable for:
+• Onboarding
+• AI feature highlights
+• Financial health score
+• Achievement cards
+• Splash screens
+• Premium branded moments
+
+Do NOT use the gradient as the background of every card.
+
+
+────────────────────────────────────
+6. TYPOGRAPHY
+────────────────────────────────────
+
+ENGLISH FONT:
+Inter
+
+Fallback:
+-apple-system,
+BlinkMacSystemFont,
+"Segoe UI",
+sans-serif
+
+ARABIC FONT:
+Noto Sans Arabic
+
+The app must support both:
+English LTR
+Arabic RTL
+
+
+TYPE SCALE
+
+Large financial number:
+36–40px
+Weight: 700
+
+Page title:
+30–32px
+Weight: 700
+
+Section heading:
+20–22px
+Weight: 650–700
+
+Card heading:
+16–18px
+Weight: 600
+
+Body:
+15–16px
+Weight: 400
+
+Button:
+14–16px
+Weight: 600
+
+Caption:
+12–13px
+Weight: 400–500
+
+
+FINANCIAL NUMBERS
+
+Financial numbers must be visually prominent.
+
+Example:
+
+AED 8,450
+Available this month
+
+AED 8,450 should visually dominate the supporting label.
+
+Use tabular numbers where possible.
+
+
+────────────────────────────────────
+7. SPACING SYSTEM
+────────────────────────────────────
+
+Use an 8px-based spacing system.
+
+4px  = micro
+8px  = small
+12px = compact
+16px = standard
+24px = section
+32px = large
+48px = major
+64px = page separation
+
+Favor whitespace.
+
+Do not try to fill every empty area.
+
+The interface should breathe.
+
+
+────────────────────────────────────
+8. BORDER RADIUS
+────────────────────────────────────
+
+Small:
+8px
+
+Buttons / Inputs:
+12px
+
+Standard cards:
+16–18px
+
+Feature cards:
+20–24px
+
+Pills:
+999px
+
+Do not make every component extremely rounded.
+
+
+────────────────────────────────────
+9. CARDS
+────────────────────────────────────
+
+Default card:
+
+background: #FFFFFF
+border: 1px solid #E4E7EC
+border-radius: 18px
+box-shadow: 0 2px 8px rgba(0,46,93,0.05)
+
+Cards should have generous internal padding:
+
+Desktop:
+24px
+
+Mobile:
+16–20px
+
+Avoid heavy shadows.
+
+Use borders and whitespace before increasing shadows.
+
+
+────────────────────────────────────
+10. BUTTONS
+────────────────────────────────────
+
+PRIMARY BUTTON
+
+Background:
+#003B73
+
+Text:
+#FFFFFF
+
+Radius:
+12px
+
+Font weight:
+600
+
+
+SECONDARY BUTTON
+
+Background:
+#FFFFFF
+
+Text:
+#003B73
+
+Border:
+1px solid #003B73
+
+
+ACCENT BUTTON
+
+Background:
+#D20A58
+
+Text:
+#FFFFFF
+
+Use only when an action deserves additional attention.
+
+
+TEXT BUTTON
+
+No container.
+
+Color:
+#139BE8
+
+Example:
+View details →
+
+
+All buttons should have clear hover, active, focus, and disabled states.
+
+
+────────────────────────────────────
+11. ICONOGRAPHY
+────────────────────────────────────
+
+Use:
+Lucide Icons
+
+Default sizes:
+20px
+22px
+24px
+
+Use consistent stroke widths.
+
+Avoid mixing icon libraries.
+
+Do not use emojis as permanent navigation icons.
+
+
+────────────────────────────────────
+12. LOGO
+────────────────────────────────────
+
+Use the supplied Bayzati logo assets.
+
+The standalone multicolor lowercase "b" symbol is the primary:
+
+• App icon
+• Favicon
+• Splash icon
+• Loading symbol
+• Compact brand mark
+
+Use the complete:
+
+ICON + "bayzati"
+
+wordmark on:
+
+• Login
+• Signup
+• Website
+• Onboarding
+• Major branded screens
+
+Do NOT:
+• Recreate the logo using CSS
+• Change logo proportions
+• Change logo colors
+• Add shadows
+• Place text inside the symbol
+• Rotate the symbol
+
+
+────────────────────────────────────
+13. NAVIGATION
+────────────────────────────────────
+
+Primary app navigation:
+
+HOME
+PLAN
+GOALS
+LEARN
+PROFILE
+
+Mobile:
+Use bottom navigation.
+
+Desktop:
+Use a clean sidebar or top/side hybrid navigation.
+
+Keep navigation minimal.
+
+Do not expose every feature at once.
+
+
+────────────────────────────────────
+14. HOME DASHBOARD
+────────────────────────────────────
+
+The dashboard should answer these questions in order:
+
+1. HOW AM I DOING?
+2. WHERE IS MY MONEY GOING?
+3. AM I ON TRACK?
+4. WHAT SHOULD I DO NEXT?
+5. WHAT CAN I LEARN?
+
+Recommended hierarchy:
+
+Greeting
+
+Financial Health
+
+Income / Spending / Available Money
+
+Monthly Budget
+
+Savings Goals
+
+Personalized Insight
+
+AI Assistant
+
+Learning Recommendation
+
+
+Do not create a traditional banking dashboard filled with balances, tables and charts.
+
+
+────────────────────────────────────
+15. FINANCIAL HEALTH
+────────────────────────────────────
+
+Financial Health should be one of the strongest visual elements.
+
+Example:
+
+Financial Health
+
+78
+GOOD
+
+↑ 6 points this month
+
+Use a clean circular indicator, progress ring, or simple gauge.
+
+Avoid complicated speedometer-style charts.
+
+Explain WHY the score changed.
+
+
+────────────────────────────────────
+16. BUDGET DESIGN
+────────────────────────────────────
+
+Budgets should be visual and easy to understand.
+
+Example:
+
+Monthly Budget
+
+AED 3,240 remaining
+
+████████████░░░░
+
+68% used
+
+Never force the user to calculate what numbers mean.
+
+Always provide interpretation.
+
+
+────────────────────────────────────
+17. GOALS
+────────────────────────────────────
+
+Goals should feel motivating but mature.
+
+Example:
+
+Travel Fund
+
+AED 6,800
+of AED 10,000
+
+68%
+
+█████████████░░░
+
+AED 3,200 to go
+
+
+Show:
+• Goal name
+• Current amount
+• Target
+• Progress
+• Remaining amount
+• Optional target date
+
+
+────────────────────────────────────
+18. CHARTS
+────────────────────────────────────
+
+Keep charts SIMPLE.
+
+Users should understand the chart within approximately 3 seconds.
+
+Color hierarchy:
+
+Primary financial data:
+#003B73
+
+Secondary:
+#139BE8
+
+Highlighted:
+#D20A58
+
+Positive:
+#12A66A
+
+Warning:
+#F5A623
+
+Critical:
+#D92D20
+
+
+Prefer:
+• Donut charts
+• Simple bar charts
+• Progress bars
+• Line charts
+• Trend indicators
+
+Avoid:
+• 3D charts
+• Complex legends
+• Too many categories
+• Rainbow charts
+• Unnecessary gridlines
+
+
+────────────────────────────────────
+19. AI ASSISTANT
+────────────────────────────────────
+
+The Bayzati AI assistant should feel like:
+
+A knowledgeable financial guide,
+NOT a generic chatbot.
+
+Its UI should use:
+
+Bayzati Navy
+Bayzati Blue
+Small Magenta accents
+
+Give the AI a subtle visual identity distinct from ordinary app screens.
+
+Suggested AI button:
+
+✦ Ask [AI NAME]
+
+Example questions:
+
+"Can I afford this?"
+
+"Where did I spend the most this month?"
+
+"Help me save AED 10,000."
+
+"Explain credit cards to me."
+
+"How much should my emergency fund be?"
+
+
+AI answers should:
+
+• Use simple language
+• Explain reasoning
+• Highlight important numbers
+• Suggest clear next steps
+• Avoid unnecessarily technical financial terminology
+
+
+────────────────────────────────────
+20. FINANCIAL LITERACY
+────────────────────────────────────
+
+The Learn section should NOT look like Moodle, Blackboard, or an LMS.
+
+Avoid:
+
+Chapter 1
+Chapter 2
+Chapter 3
+
+Instead organize learning around real financial situations.
+
+Examples:
+
+STARTING OUT
+
+Understanding Your Salary
+
+BUILDING GOOD HABITS
+
+Creating Your First Budget
+
+USING CREDIT
+
+How Credit Cards Actually Work
+
+PLANNING AHEAD
+
+Building an Emergency Fund
+
+
+Whenever possible, connect learning to user data.
+
+BAD:
+
+"Learn About Budgeting"
+
+
+BETTER:
+
+"You've used 68% of your monthly budget."
+
+"Learn how the 50/30/20 method could help you plan the remaining AED 3,240."
+
+
+────────────────────────────────────
+21. CONTENT STYLE
+────────────────────────────────────
+
+Write like a helpful financial coach.
+
+NOT like a bank policy document.
+
+BAD:
+
+Your expenditure allocation has exceeded the recommended threshold.
+
+
+GOOD:
+
+You've spent more than planned on dining this month.
+
+
+BAD:
+
+Optimize your savings allocation.
+
+
+GOOD:
+
+Putting aside AED 500 more this month would keep your goal on track.
+
+
+Use:
+• Short sentences
+• Plain English
+• Clear numbers
+• Direct recommendations
+• Helpful explanations
+
+
+────────────────────────────────────
+22. UAE LOCALIZATION
+────────────────────────────────────
+
+Default currency:
+
+AED
+
+Format consistently:
+
+AED 2,500
+
+AED 12,450.75
+
+Support both:
+English
+Arabic
+
+RTL layouts must be properly mirrored.
+
+Do not simply right-align English UI components.
+
+
+────────────────────────────────────
+23. MOBILE DESIGN
+────────────────────────────────────
+
+Design MOBILE FIRST.
+
+Primary mobile navigation:
+
+Home
+Plan
+Goals
+Learn
+Profile
+
+Minimum touch target:
+44px
+
+Keep important financial information visible without excessive scrolling.
+
+Primary actions should be reachable with one hand where practical.
+
+
+────────────────────────────────────
+24. RESPONSIVENESS
+────────────────────────────────────
+
+Mobile:
+Single-column cards
+
+Tablet:
+1–2 columns
+
+Desktop:
+Use a restrained grid.
+
+Recommended desktop content max width:
+1200–1280px
+
+Do not stretch financial cards across huge monitors.
+
+
+────────────────────────────────────
+25. ACCESSIBILITY
+────────────────────────────────────
+
+Maintain WCAG-friendly contrast.
+
+Never communicate meaning using color alone.
+
+Example:
+
+Do NOT show only:
+Red bar
+
+Instead show:
+
+Budget exceeded
+AED 340 over budget
+
++ visual warning indicator
+
+
+All interactive elements require visible focus states.
+
+
+────────────────────────────────────
+26. MOTION
+────────────────────────────────────
+
+Animations should feel subtle and premium.
+
+Use approximately:
+150–300ms transitions
+
+Suitable animations:
+
+• Progress bars filling
+• Financial health score changing
+• Goal completion
+• Card appearance
+• AI typing/loading
+• Navigation transitions
+
+Avoid:
+• Bouncing components
+• Constant animations
+• Excessive confetti
+• Game-like effects
+
+
+────────────────────────────────────
+27. DESIGN TOKENS
+────────────────────────────────────
+
+Create reusable tokens rather than hardcoding styles.
+
+:root {
+
+  --primary: #003B73;
+  --primary-dark: #002E5D;
+
+  --secondary: #139BE8;
+  --accent: #D20A58;
+
+  --success: #12A66A;
+  --warning: #F5A623;
+  --error: #D92D20;
+
+  --background: #F8FAFC;
+  --surface: #FFFFFF;
+
+  --text-primary: #17212B;
+  --text-secondary: #667085;
+  --text-muted: #98A2B3;
+
+  --border: #E4E7EC;
+
+  --soft-blue: #EAF6FD;
+  --soft-magenta: #FCEAF1;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+
+}
+
+
+────────────────────────────────────
+28. COMPONENT CONSISTENCY
+────────────────────────────────────
+
+Build reusable components for:
+
+Button
+Card
+MetricCard
+InsightCard
+GoalCard
+BudgetCard
+ProgressBar
+FinancialHealthScore
+TransactionRow
+ChartCard
+LearningCard
+AIInsightCard
+Modal
+Input
+Select
+Tabs
+Navigation
+EmptyState
+LoadingState
+
+Do not create slightly different versions of the same component on every page.
+
+
+────────────────────────────────────
+29. CORE DESIGN RULE
+────────────────────────────────────
+
+Whenever choosing between:
+
+MORE FINANCIAL INFORMATION
+
+and
+
+EASIER FINANCIAL UNDERSTANDING
+
+always choose:
+
+EASIER FINANCIAL UNDERSTANDING.
+
+
+Bayzati should make someone who is NOT financially knowledgeable feel confident using the application.
+
+
+FINAL VISUAL TARGET
+
+The finished product should look like a polished consumer fintech product created specifically for CBI UAE.
+
+It should combine:
+
+THE TRUST OF A BANK
++
+THE SIMPLICITY OF A MODERN FINTECH APP
++
+THE GUIDANCE OF A PERSONAL FINANCIAL COACH
+
+Every new screen must follow this design system.
+Do not introduce new colors, typography, icon styles, card styles, or UI patterns without a functional reason.
