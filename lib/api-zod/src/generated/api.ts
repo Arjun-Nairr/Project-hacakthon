@@ -587,18 +587,26 @@ export const checkAffordabilityBodyAmountMin = 0;
 
 export const checkAffordabilityBodyAnnualRateMin = 0;
 
+export const checkAffordabilityBodyRateTypeDefault = `reducing`;
 export const checkAffordabilityBodyTenureMonthsMax = 120;
 
 export const checkAffordabilityBodyUpfrontCashMin = 0;
 
 export const checkAffordabilityBodyFinancedFeeDefault = false;
+export const checkAffordabilityBodyProcessingFeePercentageDefault = 1;
+export const checkAffordabilityBodyProcessingFeePercentageMin = 0;
+export const checkAffordabilityBodyProcessingFeePercentageMax = 100;
+
+
 
 export const CheckAffordabilityBody = zod.object({
   "amount": zod.number().min(checkAffordabilityBodyAmountMin),
   "annualRate": zod.number().min(checkAffordabilityBodyAnnualRateMin),
+  "rateType": zod.enum(['flat', 'reducing']).default(checkAffordabilityBodyRateTypeDefault),
   "tenureMonths": zod.number().int().min(1).max(checkAffordabilityBodyTenureMonthsMax),
   "upfrontCash": zod.number().min(checkAffordabilityBodyUpfrontCashMin),
-  "financedFee": zod.boolean().default(checkAffordabilityBodyFinancedFeeDefault)
+  "financedFee": zod.boolean().default(checkAffordabilityBodyFinancedFeeDefault),
+  "processingFeePercentage": zod.number().min(checkAffordabilityBodyProcessingFeePercentageMin).max(checkAffordabilityBodyProcessingFeePercentageMax).default(checkAffordabilityBodyProcessingFeePercentageDefault)
 })
 
 export const CheckAffordabilityResponse = zod.object({
@@ -606,6 +614,8 @@ export const CheckAffordabilityResponse = zod.object({
   "headline": zod.string(),
   "monthlyInstallment": zod.number(),
   "maxInstallment": zod.number(),
+  "reducingEquivalentRate": zod.number(),
+  "apr": zod.number(),
   "legal": zod.object({
   "passes": zod.boolean(),
   "debtRatio": zod.number(),

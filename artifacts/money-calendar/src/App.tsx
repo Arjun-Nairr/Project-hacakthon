@@ -5,8 +5,9 @@ import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { MoneyShell } from '@/components/money-shell';
 import HomePage from '@/pages/home';
+import PlanHub from '@/pages/plan';
+import RentVsBuyPage from '@/pages/rent-vs-buy';
 import LoanPage from '@/pages/loan';
-import MoneyCalendarPage from '@/pages/money-calendar';
 import GoalsPage from '@/pages/goals';
 import CalendarPage from '@/pages/calendar';
 import ChatPage from '@/pages/chat';
@@ -30,7 +31,8 @@ function Router() {
       <MoneyShell>
         <Switch>
           <Route path="/onboarding" component={OnboardingPage} />
-          <Route path="/" component={MoneyCalendarPage} />
+          <Route path="/" component={PlanHub} />
+          <Route path="/plan/rent-vs-buy" component={RentVsBuyPage} />
           <Route path="/loan" component={LoanPage} />
           <Route path="/home" component={HomePage} />
           <Route path="/goals" component={GoalsPage} />

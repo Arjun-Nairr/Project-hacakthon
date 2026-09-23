@@ -22,11 +22,11 @@ function BayzatiLogo() {
 }
 
 export function BayzatiMobileShell({
-  active,
+  active = 'none',
   children,
   floatingAction,
 }: {
-  active: 'home' | 'plan' | 'goals' | 'calendar';
+  active?: 'home' | 'plan' | 'goals' | 'calendar' | 'none';
   children: ReactNode;
   floatingAction?: ReactNode;
 }) {

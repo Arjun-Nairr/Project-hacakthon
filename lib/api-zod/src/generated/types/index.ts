@@ -13,6 +13,7 @@ export * from './accountConnectionInputAccountType';
 export * from './accountConnectionPermission';
 export * from './accountConnectionStatus';
 export * from './affordabilityInput';
+export * from './affordabilityInputRateType';
 export * from './affordabilityResult';
 export * from './affordabilityResultCalendar';
 export * from './affordabilityResultLegal';

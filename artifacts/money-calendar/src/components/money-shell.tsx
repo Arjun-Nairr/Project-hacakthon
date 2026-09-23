@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react';
-import { BarChart3, CalendarDays, ChevronRight, Home, MessageCircle, ShieldCheck, Target } from 'lucide-react';
+import { BarChart3, CalendarDays, ChevronRight, Home, Landmark, MessageCircle, ShieldCheck, Target } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 
 const navItems = [
   { href: '/home', label: 'Home', icon: Home },
-  { href: '/', label: 'Plan', icon: CalendarDays },
+  { href: '/', label: 'Plan', icon: Landmark },
   { href: '/goals', label: 'Goals', icon: Target },
   { href: '/calendar', label: 'Calendar', icon: CalendarDays },
   { href: '/chat', label: 'Chat', icon: MessageCircle },
@@ -15,7 +15,7 @@ export function MoneyShell({ children }: { children: ReactNode }) {
   if (location === '/onboarding') {
     return <>{children}</>;
   }
-  if (location === '/' || location === '/home' || location === '/goals' || location === '/calendar') {
+  if (location === '/' || location === '/home' || location === '/goals' || location === '/calendar' || location === '/imports' || location === '/loan' || location === '/plan/rent-vs-buy') {
     return <>{children}</>;
   }
   return (

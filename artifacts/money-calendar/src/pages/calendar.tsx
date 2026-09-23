@@ -3,20 +3,9 @@ import { CalendarDays, Check, CircleAlert, CircleHelp, Plus, Sparkles, X } from 
 import { Link } from 'wouter';
 import { useGetMoneyCalendar, type CalendarEvent, type MoneyCalendar } from '@workspace/api-client-react';
 import { BayzatiMobileShell } from '@/components/bayzati-mobile-shell';
+import { getManualEvents, getReviewedEvents, manualEventsKey, reviewedEventsKey } from '@/lib/local-calendar';
 
 const money = (value: number) => new Intl.NumberFormat('en-AE', { maximumFractionDigits: 0 }).format(Math.round(value));
-const manualEventsKey = 'bayzati-manual-calendar-events';
-const reviewedEventsKey = 'bayzati-reviewed-calendar-events';
-
-const readStored = <T,>(key: string, fallback: T): T => {
-  if (typeof window === 'undefined') return fallback;
-  try {
-    const value = window.localStorage.getItem(key);
-    return value ? JSON.parse(value) as T : fallback;
-  } catch {
-    return fallback;
-  }
-};
 
 const statusLabel: Record<CalendarEvent['status'], string> = {
   actual: 'Actual',
@@ -80,8 +69,8 @@ function monthParts(month: string) {
 export default function CalendarPage() {
   const { data: calendar, isLoading, isError, refetch } = useGetMoneyCalendar();
   const [selectedDay, setSelectedDay] = useState(1);
-  const [manualEvents, setManualEvents] = useState<CalendarEvent[]>(() => readStored(manualEventsKey, []));
-  const [reviewedEvents, setReviewedEvents] = useState<Record<string, boolean>>(() => readStored(reviewedEventsKey, {}));
+  const [manualEvents, setManualEvents] = useState<CalendarEvent[]>(getManualEvents);
+  const [reviewedEvents, setReviewedEvents] = useState<Record<string, boolean>>(getReviewedEvents);
   const [entryOpen, setEntryOpen] = useState(false);
   const [entryType, setEntryType] = useState<'income' | 'commitment'>('commitment');
   const [entryName, setEntryName] = useState('');

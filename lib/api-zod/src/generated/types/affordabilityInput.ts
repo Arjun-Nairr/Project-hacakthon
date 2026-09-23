@@ -5,12 +5,14 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
+import type { AffordabilityInputRateType } from './affordabilityInputRateType';
 
 export interface AffordabilityInput {
   /** @minimum 0 */
   amount: number;
   /** @minimum 0 */
   annualRate: number;
+  rateType?: AffordabilityInputRateType;
   /**
      * @minimum 1
      * @maximum 120
@@ -19,4 +21,9 @@ export interface AffordabilityInput {
   /** @minimum 0 */
   upfrontCash: number;
   financedFee?: boolean;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  processingFeePercentage?: number;
 }

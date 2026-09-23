@@ -12,10 +12,10 @@ function sourceOf(relativePath: string): string {
   return readFileSync(path, "utf8");
 }
 
-const targets = [
-  "src/components/bayzati-mobile-shell.tsx",
-  "src/pages/money-calendar.tsx",
-];
+// bayzati-mobile-shell.tsx is the sole owner of this button: pages/money-calendar.tsx
+// (which used to have its own copy) was superseded by pages/plan.tsx, which renders
+// via BayzatiMobileShell instead of duplicating the button markup.
+const targets = ["src/components/bayzati-mobile-shell.tsx"];
 
 for (const path of targets) {
   test(`sparkle button in ${path} navigates to /chat and is enabled`, () => {

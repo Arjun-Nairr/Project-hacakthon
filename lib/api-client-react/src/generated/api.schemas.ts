@@ -474,11 +474,20 @@ export interface UploadUrlResponse {
   metadata?: UploadUrlRequest;
 }
 
+export type AffordabilityInputRateType = typeof AffordabilityInputRateType[keyof typeof AffordabilityInputRateType];
+
+
+export const AffordabilityInputRateType = {
+  flat: 'flat',
+  reducing: 'reducing',
+} as const;
+
 export interface AffordabilityInput {
   /** @minimum 0 */
   amount: number;
   /** @minimum 0 */
   annualRate: number;
+  rateType?: AffordabilityInputRateType;
   /**
      * @minimum 1
      * @maximum 120
@@ -487,6 +496,11 @@ export interface AffordabilityInput {
   /** @minimum 0 */
   upfrontCash: number;
   financedFee?: boolean;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  processingFeePercentage?: number;
 }
 
 export type AffordabilityResultVerdict = typeof AffordabilityResultVerdict[keyof typeof AffordabilityResultVerdict];
@@ -524,6 +538,8 @@ export interface AffordabilityResult {
   headline: string;
   monthlyInstallment: number;
   maxInstallment: number;
+  reducingEquivalentRate: number;
+  apr: number;
   legal: AffordabilityResultLegal;
   calendar: AffordabilityResultCalendar;
   resilience: AffordabilityResultResilience;
