@@ -1,0 +1,57 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap');
+
+.money-calendar-current {
+  --background: 38 42% 94%;
+  --foreground: 204 38% 17%;
+  --border: 36 21% 84%;
+  --card: 39 45% 98%;
+  --card-foreground: 204 38% 17%;
+  --sidebar: 205 40% 17%;
+  --sidebar-foreground: 39 45% 96%;
+  --sidebar-border: 205 30% 27%;
+  --sidebar-primary: 41 88% 63%;
+  --sidebar-primary-foreground: 204 38% 17%;
+  --sidebar-accent: 194 29% 26%;
+  --sidebar-accent-foreground: 39 45% 96%;
+  --primary: 190 45% 32%;
+  --primary-foreground: 39 45% 98%;
+  --secondary: 42 56% 87%;
+  --secondary-foreground: 204 38% 17%;
+  --muted: 39 25% 89%;
+  --muted-foreground: 205 17% 45%;
+  --accent: 41 88% 63%;
+  --accent-foreground: 204 38% 17%;
+  --destructive: 5 63% 48%;
+  --destructive-foreground: 39 45% 98%;
+  --input: 36 21% 80%;
+  --ring: 190 45% 32%;
+  --chart-1: 190 45% 32%;
+  --chart-2: 41 88% 63%;
+  --chart-3: 156 29% 46%;
+  --chart-4: 8 63% 58%;
+  --chart-5: 205 30% 54%;
+  --app-font-sans: 'DM Sans', sans-serif;
+  --app-font-serif: 'Instrument Serif', Georgia, serif;
+  --app-font-mono: 'DM Mono', monospace;
+  --radius: .5rem;
+  font-family: var(--app-font-sans);
+}
+
+.money-calendar-current .font-display { font-family: var(--app-font-serif); }
+.money-calendar-current .font-mono-data { font-family: var(--app-font-mono); letter-spacing: -0.03em; }
+.money-calendar-current .calendar-grid {
+  background-image: linear-gradient(to right, hsl(var(--border) / .48) 1px, transparent 1px);
+  background-size: calc(100% / 7) 100%;
+}
+.money-calendar-current .page-grain::before,
+.money-calendar-current.page-grain::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: .035;
+  z-index: 50;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E");
+}
+.money-calendar-current .soft-lift { transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease; }
+.money-calendar-current .soft-lift:hover { transform: translateY(-2px); box-shadow: 0 12px 28px hsl(204 38% 17% / .08); }
