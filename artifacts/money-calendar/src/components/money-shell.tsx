@@ -10,6 +10,9 @@ const navItems = [
 
 export function MoneyShell({ children }: { children: ReactNode }) {
   const [location] = useLocation();
+  if (location === '/') {
+    return <>{children}</>;
+  }
   return (
     <div className="page-grain min-h-[100dvh] bg-background text-foreground">
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-[252px] flex-col bg-sidebar px-5 py-6 text-sidebar-foreground md:flex">

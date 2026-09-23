@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @plugin "@tailwindcss/typography";
@@ -79,12 +79,12 @@
   --elevate-1: rgba(0, 0, 0, 0.03);
   --elevate-2: rgba(0, 0, 0, 0.08);
 
-  --background: 38 42% 94%;
-  --foreground: 204 38% 17%;
-  --border: 36 21% 84%;
-  --card: 39 45% 98%;
-  --card-foreground: 204 38% 17%;
-  --card-border: 36 21% 85%;
+  --background: 210 40% 98%;
+  --foreground: 210 27% 13%;
+  --border: 214 16% 90%;
+  --card: 0 0% 100%;
+  --card-foreground: 210 27% 13%;
+  --card-border: 214 16% 90%;
   --sidebar: 205 40% 17%;
   --sidebar-foreground: 39 45% 96%;
   --sidebar-border: 205 30% 27%;
@@ -96,16 +96,16 @@
   --popover: 39 45% 98%;
   --popover-foreground: 204 38% 17%;
   --popover-border: 36 21% 85%;
-  --primary: 190 45% 32%;
-  --primary-foreground: 39 45% 98%;
-  --secondary: 42 56% 87%;
-  --secondary-foreground: 204 38% 17%;
-  --muted: 39 25% 89%;
-  --muted-foreground: 205 17% 45%;
-  --accent: 41 88% 63%;
-  --accent-foreground: 204 38% 17%;
-  --destructive: 5 63% 48%;
-  --destructive-foreground: 39 45% 98%;
+  --primary: 209 100% 23%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 198 82% 94%;
+  --secondary-foreground: 209 100% 23%;
+  --muted: 214 16% 95%;
+  --muted-foreground: 215 16% 49%;
+  --accent: 335 91% 43%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 335 91% 43%;
+  --destructive-foreground: 0 0% 100%;
   --input: 36 21% 80%;
   --ring: 190 45% 32%;
   --chart-1: 190 45% 32%;
@@ -114,10 +114,10 @@
   --chart-4: 8 63% 58%;
   --chart-5: 205 30% 54%;
 
-  --app-font-sans: 'DM Sans', sans-serif;
-  --app-font-serif: 'Instrument Serif', Georgia, serif;
-  --app-font-mono: 'DM Mono', monospace;
-  --radius: 0.5rem; /* 8px */
+  --app-font-sans: 'Inter', system-ui, sans-serif;
+  --app-font-serif: 'Inter', system-ui, sans-serif;
+  --app-font-mono: 'Inter', system-ui, sans-serif;
+  --radius: 1.125rem;
   --shadow-2xs: 0px 2px 0px 0px hsl(204 38% 17% / 0.03);
   --shadow-xs: 0px 2px 0px 0px hsl(204 38% 17% / 0.03);
   --shadow-sm:
