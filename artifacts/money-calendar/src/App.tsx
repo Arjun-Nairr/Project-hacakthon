@@ -9,6 +9,7 @@ import LoanPage from '@/pages/loan';
 import MoneyCalendarPage from '@/pages/money-calendar';
 import GoalsPage from '@/pages/goals';
 import CalendarPage from '@/pages/calendar';
+import OnboardingPage from '@/pages/onboarding';
 import NotFound from '@/pages/not-found';
 import {
   Route,
@@ -26,6 +27,7 @@ function Router() {
     <RoutedErrorBoundary>
       <MoneyShell>
         <Switch>
+          <Route path="/onboarding" component={OnboardingPage} />
           <Route path="/" component={MoneyCalendarPage} />
           <Route path="/loan" component={LoanPage} />
           <Route path="/home" component={HomePage} />

@@ -11,6 +11,9 @@ const navItems = [
 
 export function MoneyShell({ children }: { children: ReactNode }) {
   const [location] = useLocation();
+  if (location === '/onboarding') {
+    return <>{children}</>;
+  }
   if (location === '/' || location === '/home' || location === '/goals' || location === '/calendar') {
     return <>{children}</>;
   }
