@@ -5,7 +5,11 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
+import type { CalendarEventAmountType } from './calendarEventAmountType';
+import type { CalendarEventConfidence } from './calendarEventConfidence';
 import type { CalendarEventKind } from './calendarEventKind';
+import type { CalendarEventPaymentType } from './calendarEventPaymentType';
+import type { CalendarEventStatus } from './calendarEventStatus';
 
 export interface CalendarEvent {
   id: string;
@@ -13,6 +17,14 @@ export interface CalendarEvent {
   amount: number;
   day: number;
   kind: CalendarEventKind;
+  paymentType: CalendarEventPaymentType;
+  status: CalendarEventStatus;
+  confidence: CalendarEventConfidence;
+  amountType: CalendarEventAmountType;
+  accountName: string;
+  reviewed: boolean;
+  /** @nullable */
+  balanceAfter?: number | null;
   /** @nullable */
   note?: string | null;
 }

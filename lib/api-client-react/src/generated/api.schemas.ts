@@ -25,14 +25,89 @@ export const CalendarEventKind = {
   goal: 'goal',
 } as const;
 
+export type CalendarEventPaymentType = typeof CalendarEventPaymentType[keyof typeof CalendarEventPaymentType];
+
+
+export const CalendarEventPaymentType = {
+  salary: 'salary',
+  rent: 'rent',
+  loan: 'loan',
+  school: 'school',
+  'credit-card': 'credit-card',
+  insurance: 'insurance',
+  goal: 'goal',
+} as const;
+
+export type CalendarEventStatus = typeof CalendarEventStatus[keyof typeof CalendarEventStatus];
+
+
+export const CalendarEventStatus = {
+  actual: 'actual',
+  forecasted: 'forecasted',
+  pending: 'pending',
+  overdue: 'overdue',
+} as const;
+
+export type CalendarEventConfidence = typeof CalendarEventConfidence[keyof typeof CalendarEventConfidence];
+
+
+export const CalendarEventConfidence = {
+  high: 'high',
+  medium: 'medium',
+  low: 'low',
+} as const;
+
+export type CalendarEventAmountType = typeof CalendarEventAmountType[keyof typeof CalendarEventAmountType];
+
+
+export const CalendarEventAmountType = {
+  fixed: 'fixed',
+  variable: 'variable',
+  range: 'range',
+} as const;
+
 export interface CalendarEvent {
   id: string;
   label: string;
   amount: number;
   day: number;
   kind: CalendarEventKind;
+  paymentType: CalendarEventPaymentType;
+  status: CalendarEventStatus;
+  confidence: CalendarEventConfidence;
+  amountType: CalendarEventAmountType;
+  accountName: string;
+  reviewed: boolean;
+  /** @nullable */
+  balanceAfter?: number | null;
   /** @nullable */
   note?: string | null;
+}
+
+export interface SafeToSpendScenario {
+  spendAmount: number;
+  safeToSpendAfter: number;
+}
+
+export type FinancialSnapshotCurrency = typeof FinancialSnapshotCurrency[keyof typeof FinancialSnapshotCurrency];
+
+
+export const FinancialSnapshotCurrency = {
+  AED: 'AED',
+} as const;
+
+export interface FinancialSnapshot {
+  asOf: string;
+  currency: FinancialSnapshotCurrency;
+  currentAvailableBalance: number;
+  expectedIncomeBeforeNextPayday: number;
+  billsAndCommitmentsDueBeforeNextPayday: number;
+  minimumDebtPayments: number;
+  plannedGoalContributions: number;
+  recommendedEmergencyBuffer: number;
+  safeToSpendUntilPayday: number;
+  safeToSpendThisMonth: number;
+  scenarios: SafeToSpendScenario[];
 }
 
 export interface MoneyCalendar {
@@ -43,6 +118,7 @@ export interface MoneyCalendar {
   projectedPayday: number;
   tightDay: number;
   bufferTarget: number;
+  financialSnapshot: FinancialSnapshot;
   income?: Income;
   events: CalendarEvent[];
   assumptions: string[];

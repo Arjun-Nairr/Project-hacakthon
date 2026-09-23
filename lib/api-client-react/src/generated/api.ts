@@ -144,8 +144,8 @@ export const getGetMoneyCalendarUrl = () => {
 }
 
 /**
- * Returns the demo persona, calendar events, and current cash-flow summary.
- * @summary Get seeded money calendar
+ * Returns the structured financial picture used by the calendar and safe-to-spend calculation.
+ * @summary Get the money timeline and safe-to-spend forecast
  */
 export const getMoneyCalendar = async ( options?: Parameters<typeof customFetch>[1]): Promise<MoneyCalendar> => {
 
@@ -192,7 +192,7 @@ export type GetMoneyCalendarQueryError = ErrorType<unknown>
 
 
 /**
- * @summary Get seeded money calendar
+ * @summary Get the money timeline and safe-to-spend forecast
  */
 
 export function useGetMoneyCalendar<TData = Awaited<ReturnType<typeof getMoneyCalendar>>, TError = ErrorType<unknown>>(

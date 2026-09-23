@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { CalendarEvent } from './calendarEvent';
+import type { FinancialSnapshot } from './financialSnapshot';
 import type { Income } from './income';
 
 export interface MoneyCalendar {
@@ -16,6 +17,7 @@ export interface MoneyCalendar {
   projectedPayday: number;
   tightDay: number;
   bufferTarget: number;
+  financialSnapshot: FinancialSnapshot;
   income?: Income;
   events: CalendarEvent[];
   assumptions: string[];

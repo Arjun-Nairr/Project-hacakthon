@@ -18,8 +18,8 @@ export const HealthCheckResponse = zod.object({
 
 
 /**
- * Returns the demo persona, calendar events, and current cash-flow summary.
- * @summary Get seeded money calendar
+ * Returns the structured financial picture used by the calendar and safe-to-spend calculation.
+ * @summary Get the money timeline and safe-to-spend forecast
  */
 export const GetMoneyCalendarResponse = zod.object({
   "persona": zod.string(),
@@ -29,6 +29,22 @@ export const GetMoneyCalendarResponse = zod.object({
   "projectedPayday": zod.number(),
   "tightDay": zod.number().int(),
   "bufferTarget": zod.number(),
+  "financialSnapshot": zod.object({
+  "asOf": zod.coerce.date(),
+  "currency": zod.enum(['AED']),
+  "currentAvailableBalance": zod.number(),
+  "expectedIncomeBeforeNextPayday": zod.number(),
+  "billsAndCommitmentsDueBeforeNextPayday": zod.number(),
+  "minimumDebtPayments": zod.number(),
+  "plannedGoalContributions": zod.number(),
+  "recommendedEmergencyBuffer": zod.number(),
+  "safeToSpendUntilPayday": zod.number(),
+  "safeToSpendThisMonth": zod.number(),
+  "scenarios": zod.array(zod.object({
+  "spendAmount": zod.number(),
+  "safeToSpendAfter": zod.number()
+}))
+}),
   "income": zod.object({
   "basic": zod.number(),
   "housingAllowance": zod.number(),
@@ -40,6 +56,13 @@ export const GetMoneyCalendarResponse = zod.object({
   "amount": zod.number(),
   "day": zod.number().int(),
   "kind": zod.enum(['income', 'fixed', 'lump', 'goal']),
+  "paymentType": zod.enum(['salary', 'rent', 'loan', 'school', 'credit-card', 'insurance', 'goal']),
+  "status": zod.enum(['actual', 'forecasted', 'pending', 'overdue']),
+  "confidence": zod.enum(['high', 'medium', 'low']),
+  "amountType": zod.enum(['fixed', 'variable', 'range']),
+  "accountName": zod.string(),
+  "reviewed": zod.boolean(),
+  "balanceAfter": zod.number().nullish(),
   "note": zod.string().nullish()
 })),
   "assumptions": zod.array(zod.string())
