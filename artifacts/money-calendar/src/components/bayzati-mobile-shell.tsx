@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { Bell, BookOpen, CalendarDays, Home, Landmark, Target, X } from 'lucide-react';
+import { Bell, BookOpen, Home, Landmark, Sparkles, Target, X } from 'lucide-react';
 import { Link } from 'wouter';
 
 const navItems = [
@@ -35,8 +35,8 @@ export function BayzatiMobileShell({
   return (
     <main className="relative mx-auto min-h-[100dvh] w-full max-w-[520px] overflow-x-hidden bg-[#F8FAFC] font-['Inter',system-ui,sans-serif] text-[#17212B] shadow-[0_0_40px_rgba(0,46,93,.06)]">
       <div className="pointer-events-none absolute -right-24 -top-24 size-64 rounded-full bg-[#EAF6FD] opacity-70" />
-      <div className="relative px-5 pb-40 pt-6">
-        <header className="flex items-center justify-between">
+      <div className="relative px-5 pb-40 pt-[92px]">
+        <header className="fixed inset-x-0 top-0 z-20 mx-auto flex h-[82px] w-full max-w-[520px] items-center justify-between border-b border-white/70 bg-white/70 px-5 shadow-[0_8px_24px_rgba(0,59,115,.05)] backdrop-blur-xl">
           <BayzatiLogo />
           <div className="flex items-center gap-2">
             <button
@@ -66,19 +66,27 @@ export function BayzatiMobileShell({
         </div>
       )}
 
-      <nav className="fixed inset-x-4 bottom-4 z-20 mx-auto flex max-w-[488px] items-center rounded-full border border-[#E4E7EC] bg-white px-1 shadow-[0_2px_8px_rgba(0,46,93,.05)]" aria-label="Bayzati navigation">
-        {navItems.map(({ href, label, icon: Icon }) => (
-          <Link
-            key={label}
-            href={href}
-            className={`flex h-[60px] min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-full ${active === label.toLowerCase() ? 'bg-[#EAF6FD] text-[#003B73]' : 'text-[#667085]'}`}
-            data-testid={`link-nav-${label.toLowerCase()}`}
-          >
-            <Icon size={20} />
-            <span className="text-[10px] font-semibold">{label}</span>
-          </Link>
-        ))}
-      </nav>
+      <div className="fixed inset-x-3 bottom-4 z-20 mx-auto flex max-w-[496px] items-center gap-2">
+        <nav className="flex h-[70px] min-w-0 flex-1 items-center rounded-full border border-white/80 bg-white/85 px-1 shadow-[0_8px_24px_rgba(0,46,93,.12)] backdrop-blur-xl" aria-label="Bayzati navigation">
+          {navItems.map(({ href, label, icon: Icon }) => (
+            <Link
+              key={label}
+              href={href}
+              className={`flex h-[60px] min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-full ${active === label.toLowerCase() ? 'bg-[#EAF6FD] text-[#003B73]' : 'text-[#667085]'}`}
+              data-testid={`link-nav-${label.toLowerCase()}`}
+            >
+              <Icon size={20} />
+              <span className="text-[10px] font-semibold">{label}</span>
+            </Link>
+          ))}
+        </nav>
+        <button type="button" disabled aria-label="Quick action reserved for a future integration" className="grid size-[70px] shrink-0 place-items-center rounded-full border border-white/80 bg-white/85 shadow-[0_8px_24px_rgba(0,46,93,.14)] backdrop-blur-xl" data-testid="button-reserved-quick-action">
+          <span className="relative grid size-[58px] place-items-center rounded-full border border-[#E4E7EC] text-[#003B73]">
+            <Sparkles size={20} />
+            <i className="absolute right-[12px] top-[10px] size-1.5 rounded-full bg-[#D20A58]" />
+          </span>
+        </button>
+      </div>
 
       {panel && (
         <div className="fixed inset-0 z-30 bg-[#092e59]/25" onClick={() => setPanel(null)}>
