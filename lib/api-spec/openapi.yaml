@@ -30,8 +30,8 @@ paths:
     get:
       operationId: getMoneyCalendar
       tags: [money]
-      summary: Get seeded money calendar
-      description: Returns the demo persona, calendar events, and current cash-flow summary.
+      summary: Get the money timeline and safe-to-spend forecast
+      description: Returns the structured financial picture used by the calendar and safe-to-spend calculation.
       responses:
         "200":
           description: Seeded money calendar
@@ -111,7 +111,7 @@ components:
         variable: { type: number }
     CalendarEvent:
       type: object
-      required: [id, label, amount, day, kind]
+      required: [id, label, amount, day, kind, paymentType, status, confidence, amountType, accountName, reviewed]
       properties:
         id: { type: string }
         label: { type: string }
@@ -120,10 +120,48 @@ components:
         kind:
           type: string
           enum: [income, fixed, lump, goal]
+        paymentType:
+          type: string
+          enum: [salary, rent, loan, school, credit-card, insurance, goal]
+        status:
+          type: string
+          enum: [actual, forecasted, pending, overdue]
+        confidence:
+          type: string
+          enum: [high, medium, low]
+        amountType:
+          type: string
+          enum: [fixed, variable, range]
+        accountName: { type: string }
+        reviewed: { type: boolean }
+        balanceAfter: { type: ["number", "null"] }
         note: { type: ["string", "null"] }
+    SafeToSpendScenario:
+      type: object
+      required: [spendAmount, safeToSpendAfter]
+      properties:
+        spendAmount: { type: number }
+        safeToSpendAfter: { type: number }
+    FinancialSnapshot:
+      type: object
+      required: [asOf, currency, currentAvailableBalance, expectedIncomeBeforeNextPayday, billsAndCommitmentsDueBeforeNextPayday, minimumDebtPayments, plannedGoalContributions, recommendedEmergencyBuffer, safeToSpendUntilPayday, safeToSpendThisMonth, scenarios]
+      properties:
+        asOf: { type: string, format: date }
+        currency: { type: string, enum: [AED] }
+        currentAvailableBalance: { type: number }
+        expectedIncomeBeforeNextPayday: { type: number }
+        billsAndCommitmentsDueBeforeNextPayday: { type: number }
+        minimumDebtPayments: { type: number }
+        plannedGoalContributions: { type: number }
+        recommendedEmergencyBuffer: { type: number }
+        safeToSpendUntilPayday: { type: number }
+        safeToSpendThisMonth: { type: number }
+        scenarios:
+          type: array
+          items: { $ref: "#/components/schemas/SafeToSpendScenario" }
     MoneyCalendar:
       type: object
-      required: [persona, month, monthLabel, safeToSpend, projectedPayday, tightDay, bufferTarget, events, assumptions]
+      required: [persona, month, monthLabel, safeToSpend, projectedPayday, tightDay, bufferTarget, financialSnapshot, events, assumptions]
       properties:
         persona: { type: string }
         month: { type: string }
@@ -132,6 +170,8 @@ components:
         projectedPayday: { type: number }
         tightDay: { type: integer }
         bufferTarget: { type: number }
+        financialSnapshot:
+          $ref: "#/components/schemas/FinancialSnapshot"
         income:
           $ref: "#/components/schemas/Income"
         events:
