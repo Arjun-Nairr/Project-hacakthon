@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Money Calendar"
+description = "A plain-language UAE personal finance demo that turns a customer's real cash flow into a money calendar, tests loan affordability, and compares renting with buying without hiding the assumptions."
+version = "1.0.0"
+id = "artifacts/money-calendar"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 20745
+
+[services.development]
+run = "pnpm --filter @workspace/money-calendar run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/money-calendar", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/money-calendar/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "20745"
+BASE_PATH = "/"

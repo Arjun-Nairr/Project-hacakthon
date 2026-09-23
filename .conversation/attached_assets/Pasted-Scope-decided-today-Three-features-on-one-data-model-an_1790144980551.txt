@@ -1,0 +1,33 @@
+Scope, decided today. Three features on one data model + an LLM layer that explains everything in plain language. The app acts on the customer's real numbers first; the financial literacy is the by-product.
+
+1) Money calendar (the backbone)
+Inputs: income (basic / allowances / variable), existing instalments and card minimums, rent cheques, planned lumps (school fees, insurance, registration), monthly savings goal, buffer target.
+Outputs: safe-to-spend today, forecast to payday, auto set-aside for each upcoming lump, and a warning like "cash goes negative on the 27th".
+
+2) "Can I afford this loan?" (lives inside the calendar)
+User enters a purchase + rough loan terms (amount, rate, tenure). Engine runs three tests:
+- Legal (CBUAE): total instalments ≤ 50% of income; personal loan ≤ 20x salary and ≤ 48 months; car loan ≤ 80% of value and ≤ 60 months. Count income like a bank: 100% basic, 50% housing allowance, 0% variable.
+- Calendar fit: simulate the instalment month by month across the whole tenure; the verdict is the worst month (school-fee month), not the average.
+- Resilience: buffer still at target after any upfront cash; how many months the plan survives with no income.
+Output: fits / fits if… (what gives: smaller amount, longer tenure, pause a goal, wait N months) / doesn't fit, plus the max instalment that fits. Then derived conditions: shortest tenure that clears the worst month, fixed vs variable (does it still clear at +2%?), processing fee upfront vs financed, early settlement (1% of remaining, capped AED 10k), and a save-first alternative.
+
+3) Rent vs buy chat
+LLM opens with 5 questions: current rent or target price, savings, years you expect to stay, income + existing instalments, family plans in 5 years. Everything else is a visible default the user can change.
+Engine computes: day-one cash (down payment 20% for a first home under AED 5m + roughly 6–7% in fees: DLD 4%, agent 2%, mortgage registration 0.25%, trustee, valuation, bank fee), monthly cost of owning vs renting, break-even year, net position at year N under 3 price scenarios (flat / +3%/yr / −10%), stress test (+2% rate, −15% price, 3 months no income).
+Verdict in one line ("rent for now" / "buy if you stay ≥ N years" / "buy") + the one factor that would flip it. Then dissect on demand: mortgage type (fixed period vs variable, tenure, overpayment rights), off-plan vs ready, renting it out, exit costs. Each answer re-runs the numbers.
+Ends by dropping the instalment + service charge onto the calendar → feature 2 tests whether the month clears.
+
+Build rules
+- The LLM never does arithmetic. Four engine functions: affordability(calendar, loan), amortization(amount, rate, tenure, flat|reducing), rentVsBuy(inputs, scenario), stress(inputs). Plus a constants table for the CBUAE rules above.
+- The LLM does: parse free text into structured fields, ask the one missing question, explain results in 3 lines, switch language (EN/AR minimum). Structured JSON in and out, as few calls as possible — judges score token efficiency and "use of Replit".
+- Every output shows its assumptions, includes a "do nothing" option, and flags when CBI earns money on the outcome.
+- Data: mock CBI transactions + manual entry / CSV. No real bank integration. Open finance (Al Tareq) is in the pitch as the future data source, not in the build.
+
+Tools I'd set up
+Replit project; small backend (Python or Node, your call); SQLite or JSON store; one LLM API key with a system prompt per feature; simple web frontend with a calendar view + a chat panel. Replit Agent can scaffold the UI, but keep the engine hand-written so the maths is auditable when judges ask. Seed one persona so the demo runs without typing: salaried expat, AED 25k, rent in 2 cheques, two kids' school fees, one car loan.
+
+Demo flow (~3 min)
+Open calendar → safe-to-spend + the tight month → "can I take an AED 80k loan?" → verdict + what gives → rent vs buy chat → verdict → instalment lands on the calendar → fits or not.
+
+Out of scope
+Comparing loans across banks, investing, retirement, insurance, budgeting categories beyond what the calendar needs.

@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: money
+    description: Personal finance calculations
 paths:
   /healthz:
     get:
@@ -24,6 +26,73 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /money-calendar:
+    get:
+      operationId: getMoneyCalendar
+      tags: [money]
+      summary: Get seeded money calendar
+      description: Returns the demo persona, calendar events, and current cash-flow summary.
+      responses:
+        "200":
+          description: Seeded money calendar
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MoneyCalendar"
+  /affordability:
+    post:
+      operationId: checkAffordability
+      tags: [money]
+      summary: Check a loan against legal, calendar, and resilience rules
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AffordabilityInput"
+      responses:
+        "200":
+          description: Affordability result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AffordabilityResult"
+  /rent-vs-buy:
+    post:
+      operationId: compareRentVsBuy
+      tags: [money]
+      summary: Compare renting with buying a home
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RentVsBuyInput"
+      responses:
+        "200":
+          description: Rent versus buy result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RentVsBuyResult"
+  /stress:
+    post:
+      operationId: runStressTest
+      tags: [money]
+      summary: Run a no-income and rate stress test
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StressInput"
+      responses:
+        "200":
+          description: Stress test result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StressResult"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +102,144 @@ components:
           type: string
       required:
         - status
+    Income:
+      type: object
+      required: [basic, housingAllowance, variable]
+      properties:
+        basic: { type: number }
+        housingAllowance: { type: number }
+        variable: { type: number }
+    CalendarEvent:
+      type: object
+      required: [id, label, amount, day, kind]
+      properties:
+        id: { type: string }
+        label: { type: string }
+        amount: { type: number }
+        day: { type: integer }
+        kind:
+          type: string
+          enum: [income, fixed, lump, goal]
+        note: { type: ["string", "null"] }
+    MoneyCalendar:
+      type: object
+      required: [persona, month, monthLabel, safeToSpend, projectedPayday, tightDay, bufferTarget, events, assumptions]
+      properties:
+        persona: { type: string }
+        month: { type: string }
+        monthLabel: { type: string }
+        safeToSpend: { type: number }
+        projectedPayday: { type: number }
+        tightDay: { type: integer }
+        bufferTarget: { type: number }
+        income:
+          $ref: "#/components/schemas/Income"
+        events:
+          type: array
+          items: { $ref: "#/components/schemas/CalendarEvent" }
+        assumptions:
+          type: array
+          items: { type: string }
+    AffordabilityInput:
+      type: object
+      required: [amount, annualRate, tenureMonths, upfrontCash]
+      properties:
+        amount: { type: number, minimum: 0 }
+        annualRate: { type: number, minimum: 0 }
+        tenureMonths: { type: integer, minimum: 1, maximum: 120 }
+        upfrontCash: { type: number, minimum: 0 }
+        financedFee: { type: boolean, default: false }
+    AffordabilityResult:
+      type: object
+      required: [verdict, headline, monthlyInstallment, maxInstallment, legal, calendar, resilience, suggestions, assumptions]
+      properties:
+        verdict:
+          type: string
+          enum: [fits, fits-if, doesnt-fit]
+        headline: { type: string }
+        monthlyInstallment: { type: number }
+        maxInstallment: { type: number }
+        legal:
+          type: object
+          required: [passes, debtRatio, maxDebtRatio, salaryMultiple, maxSalaryMultiple, maxTermMonths]
+          properties:
+            passes: { type: boolean }
+            debtRatio: { type: number }
+            maxDebtRatio: { type: number }
+            salaryMultiple: { type: number }
+            maxSalaryMultiple: { type: number }
+            maxTermMonths: { type: integer }
+        calendar:
+          type: object
+          required: [passes, worstMonth, lowestBalance]
+          properties:
+            passes: { type: boolean }
+            worstMonth: { type: string }
+            lowestBalance: { type: number }
+        resilience:
+          type: object
+          required: [bufferAfterUpfront, monthsSurvived, targetBuffer]
+          properties:
+            bufferAfterUpfront: { type: number }
+            monthsSurvived: { type: number }
+            targetBuffer: { type: number }
+        suggestions:
+          type: array
+          items: { type: string }
+        assumptions:
+          type: array
+          items: { type: string }
+    RentVsBuyInput:
+      type: object
+      required: [monthlyRent, homePrice, savings, yearsToStay, annualIncome, existingInstallments, familyPlans]
+      properties:
+        monthlyRent: { type: number, minimum: 0 }
+        homePrice: { type: number, minimum: 0 }
+        savings: { type: number, minimum: 0 }
+        yearsToStay: { type: integer, minimum: 1, maximum: 30 }
+        annualIncome: { type: number, minimum: 0 }
+        existingInstallments: { type: number, minimum: 0 }
+        familyPlans: { type: string }
+    RentVsBuyResult:
+      type: object
+      required: [verdict, headline, dayOneCash, monthlyOwning, monthlyRenting, breakEvenYear, scenarios, flipFactor, assumptions]
+      properties:
+        verdict:
+          type: string
+          enum: [rent-for-now, buy-if, buy]
+        headline: { type: string }
+        dayOneCash: { type: number }
+        monthlyOwning: { type: number }
+        monthlyRenting: { type: number }
+        breakEvenYear: { type: number }
+        flipFactor: { type: string }
+        scenarios:
+          type: array
+          items:
+            type: object
+            required: [label, netPosition]
+            properties:
+              label: { type: string }
+              netPosition: { type: number }
+        assumptions:
+          type: array
+          items: { type: string }
+    StressInput:
+      type: object
+      required: [monthlyIncome, monthlyCommitments, buffer, rateIncrease, priceDrop, noIncomeMonths]
+      properties:
+        monthlyIncome: { type: number }
+        monthlyCommitments: { type: number }
+        buffer: { type: number }
+        rateIncrease: { type: number }
+        priceDrop: { type: number }
+        noIncomeMonths: { type: integer }
+    StressResult:
+      type: object
+      required: [monthsSurvived, stressedMonthlyCommitment, endingBuffer, headline]
+      properties:
+        monthsSurvived: { type: number }
+        stressedMonthlyCommitment: { type: number }
+        endingBuffer: { type: number }
+        headline: { type: string }
 
