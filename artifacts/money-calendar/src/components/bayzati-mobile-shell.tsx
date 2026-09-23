@@ -1,12 +1,12 @@
 import { useState, type ReactNode } from 'react';
-import { Bell, BookOpen, Home, Landmark, Sparkles, Target, X } from 'lucide-react';
+import { Bell, CalendarDays, Home, Landmark, Sparkles, Target, X } from 'lucide-react';
 import { Link } from 'wouter';
 
 const navItems = [
   { href: '/home', label: 'Home', icon: Home },
   { href: '/', label: 'Plan', icon: Landmark },
   { href: '/goals', label: 'Goals', icon: Target },
-  { href: '/learn', label: 'Learn', icon: BookOpen },
+  { href: '/calendar', label: 'Calendar', icon: CalendarDays },
 ];
 
 function BayzatiLogo() {
@@ -26,7 +26,7 @@ export function BayzatiMobileShell({
   children,
   floatingAction,
 }: {
-  active: 'home' | 'plan' | 'goals' | 'learn';
+  active: 'home' | 'plan' | 'goals' | 'calendar';
   children: ReactNode;
   floatingAction?: ReactNode;
 }) {

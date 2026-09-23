@@ -8,7 +8,7 @@ import HomePage from '@/pages/home';
 import LoanPage from '@/pages/loan';
 import MoneyCalendarPage from '@/pages/money-calendar';
 import GoalsPage from '@/pages/goals';
-import LearnPage from '@/pages/learn';
+import CalendarPage from '@/pages/calendar';
 import NotFound from '@/pages/not-found';
 import {
   Route,
@@ -30,7 +30,7 @@ function Router() {
           <Route path="/loan" component={LoanPage} />
           <Route path="/home" component={HomePage} />
           <Route path="/goals" component={GoalsPage} />
-          <Route path="/learn" component={LearnPage} />
+          <Route path="/calendar" component={CalendarPage} />
           <Route component={NotFound} />
         </Switch>
       </MoneyShell>

@@ -39,7 +39,7 @@ export default function LearnPage() {
   const visibleGuides = useMemo(() => guides.filter((guide) => (!showSaved || saved.includes(guide.id)) && `${guide.title} ${guide.summary}`.toLowerCase().includes(query.toLowerCase())), [query, saved, showSaved]);
   const toggleSaved = (id: string) => setSaved((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
 
-  return <BayzatiMobileShell active="learn">
+  return <BayzatiMobileShell active="calendar">
     <div className="relative" data-testid="page-learn">
       <header className="mt-7">
         <div><p className="text-[11px] font-semibold uppercase tracking-[.16em] text-[#667085]">Learn</p><h1 className="mt-1 text-[28px] font-bold leading-none tracking-[-.04em] text-[#003B73]" data-testid="heading-learn">Money help for real life.</h1><p className="mt-3 max-w-[440px] text-[12px] leading-5 text-[#667085]">Short, practical guides for the moments where money and life overlap.</p></div>
