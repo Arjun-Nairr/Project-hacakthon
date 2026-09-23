@@ -11,7 +11,7 @@ const navItems = [
 
 export function MoneyShell({ children }: { children: ReactNode }) {
   const [location] = useLocation();
-  if (location === '/') {
+  if (location === '/' || location === '/goals' || location === '/learn') {
     return <>{children}</>;
   }
   return (
