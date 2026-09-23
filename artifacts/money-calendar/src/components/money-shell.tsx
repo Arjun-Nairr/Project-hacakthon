@@ -14,7 +14,7 @@ export function MoneyShell({ children }: { children: ReactNode }) {
   if (location === '/onboarding') {
     return <>{children}</>;
   }
-  if (location === '/' || location === '/home' || location === '/goals' || location === '/calendar') {
+  if (location === '/' || location === '/home' || location === '/goals' || location === '/calendar' || location === '/imports' || location === '/loan') {
     return <>{children}</>;
   }
   return (
