@@ -536,12 +536,17 @@ components:
       properties:
         amount: { type: number, minimum: 0 }
         annualRate: { type: number, minimum: 0 }
+        rateType:
+          type: string
+          enum: [flat, reducing]
+          default: reducing
         tenureMonths: { type: integer, minimum: 1, maximum: 120 }
         upfrontCash: { type: number, minimum: 0 }
         financedFee: { type: boolean, default: false }
+        processingFeePercentage: { type: number, minimum: 0, maximum: 100, default: 1 }
     AffordabilityResult:
       type: object
-      required: [verdict, headline, monthlyInstallment, maxInstallment, legal, calendar, resilience, suggestions, assumptions]
+      required: [verdict, headline, monthlyInstallment, maxInstallment, reducingEquivalentRate, apr, legal, calendar, resilience, suggestions, assumptions]
       properties:
         verdict:
           type: string
@@ -549,6 +554,8 @@ components:
         headline: { type: string }
         monthlyInstallment: { type: number }
         maxInstallment: { type: number }
+        reducingEquivalentRate: { type: number }
+        apr: { type: number }
         legal:
           type: object
           required: [passes, debtRatio, maxDebtRatio, salaryMultiple, maxSalaryMultiple, maxTermMonths]

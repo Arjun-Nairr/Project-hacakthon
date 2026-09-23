@@ -15,6 +15,8 @@ export interface AffordabilityResult {
   headline: string;
   monthlyInstallment: number;
   maxInstallment: number;
+  reducingEquivalentRate: number;
+  apr: number;
   legal: AffordabilityResultLegal;
   calendar: AffordabilityResultCalendar;
   resilience: AffordabilityResultResilience;

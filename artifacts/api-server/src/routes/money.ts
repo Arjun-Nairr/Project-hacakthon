@@ -17,6 +17,8 @@ import {
 } from "../lib/financial-model";
 import { getAcceptedImportedEvents } from "../lib/imports";
 import { getFinancialProfile } from "../lib/profile";
+import { calculateAmortisation, calculateDebtBurden, calculateDubaiPurchaseCosts } from "../lib/money-engine";
+import { ruleAssumption, ruleNumber } from "../lib/uae-rules";
 
 const router: IRouter = Router();
 
@@ -195,37 +197,48 @@ async function buildCalendar() {
   };
 }
 
-function monthlyPayment(amount: number, annualRate: number, tenureMonths: number) {
-  const rate = annualRate / 100 / 12;
-  if (rate === 0) return amount / tenureMonths;
-  return (amount * rate * (1 + rate) ** tenureMonths) / ((1 + rate) ** tenureMonths - 1);
-}
-
 async function checkAffordability(input: {
   amount: number;
   annualRate: number;
   tenureMonths: number;
   upfrontCash: number;
   financedFee: boolean;
+  rateType?: "flat" | "reducing";
+  processingFeePercentage?: number;
 }) {
-  const fee = input.amount * 0.01;
-  const financedAmount = input.amount + (input.financedFee ? fee : 0);
-  const installment = monthlyPayment(financedAmount, input.annualRate, input.tenureMonths);
+  const amortisation = calculateAmortisation({
+    principal: input.amount,
+    annualRatePct: input.annualRate,
+    tenorMonths: input.tenureMonths,
+    rateType: input.rateType ?? "reducing",
+    processingFeePct: input.processingFeePercentage ?? ruleNumber("loan_processing_fee_rate") * 100,
+    feeFinanced: input.financedFee,
+    processingFeeRuleUsed: input.processingFeePercentage === undefined,
+  });
+  const installment = amortisation.installment;
   const currentCalendar = await buildCalendar();
   const planIncome = currentCalendar.income ?? income;
-  const recognizedIncome = planIncome.basic + planIncome.housingAllowance * 0.5;
   const existingInstallments = currentCalendar.financialSnapshot.minimumDebtPayments;
+  const debtBurden = calculateDebtBurden({
+    basicIncome: planIncome.basic,
+    fixedAllowance: planIncome.housingAllowance,
+    variablePay: planIncome.variable,
+    existingInstallments,
+  });
+  const recognizedIncome = debtBurden.countedIncome;
   const debtRatio = (existingInstallments + installment) / Math.max(recognizedIncome, 1);
-  const salaryMultiple = input.amount / Math.max(planIncome.basic, 1);
-  const legalPasses = debtRatio <= 0.5 && salaryMultiple <= 20 && input.tenureMonths <= 48;
+  const salaryMultiple = input.amount / Math.max(recognizedIncome, 1);
+  const legalPasses = debtRatio <= ruleNumber("debt_burden_gross_income_cap")
+    && salaryMultiple <= ruleNumber("personal_loan_salary_multiple")
+    && input.tenureMonths <= ruleNumber("personal_loan_max_term_months");
   const lowestBalance = currentCalendar.safeToSpend - installment;
   const calendarPasses = lowestBalance >= 0;
   const bufferAfterUpfront = currentCalendar.bufferTarget - input.upfrontCash;
   const monthlyBurn = Math.max(currentCalendar.financialSnapshot.billsAndCommitmentsDueBeforeNextPayday, 1) + installment;
   const monthsSurvived = Math.max(0, bufferAfterUpfront / monthlyBurn);
-  const resiliencePasses = bufferAfterUpfront >= currentCalendar.bufferTarget && monthsSurvived >= 2;
+  const resiliencePasses = bufferAfterUpfront >= currentCalendar.bufferTarget && monthsSurvived >= ruleNumber("resilience_target_months");
   const maxInstallment = Math.max(0, Math.min(
-    recognizedIncome * 0.5 - existingInstallments,
+    debtBurden.headroom,
     currentCalendar.safeToSpend,
   ));
   const passes = legalPasses && calendarPasses && resiliencePasses;
@@ -245,13 +258,15 @@ async function checkAffordability(input: {
         : `Cash goes negative around the ${currentCalendar.tightDay}th in the tight month.`,
     monthlyInstallment: Math.round(installment),
     maxInstallment: Math.round(maxInstallment),
+    reducingEquivalentRate: Number(amortisation.reducingEquivalentRatePct.toFixed(4)),
+    apr: Number(amortisation.aprPct.toFixed(4)),
     legal: {
       passes: legalPasses,
       debtRatio: Number((debtRatio * 100).toFixed(1)),
-      maxDebtRatio: 50,
+      maxDebtRatio: ruleNumber("debt_burden_gross_income_cap") * 100,
       salaryMultiple: Number(salaryMultiple.toFixed(1)),
-      maxSalaryMultiple: 20,
-      maxTermMonths: 48,
+      maxSalaryMultiple: ruleNumber("personal_loan_salary_multiple"),
+      maxTermMonths: ruleNumber("personal_loan_max_term_months"),
     },
     calendar: {
       passes: calendarPasses,
@@ -265,9 +280,10 @@ async function checkAffordability(input: {
     },
     suggestions,
     assumptions: [
-      "CBUAE screen: total instalments ≤ 50% of recognized income.",
-      "Personal loans are capped at 20× basic salary and 48 months.",
-      `Processing fee is ${input.financedFee ? "financed" : "paid upfront"} at 1% for this comparison.`,
+      ...debtBurden.assumptions,
+      ...ruleAssumption("personal_loan_salary_multiple", "personal_loan_max_term_months", "resilience_target_months"),
+      `Processing fee is ${input.financedFee ? "financed" : "paid upfront"} at ${(input.processingFeePercentage ?? ruleNumber("loan_processing_fee_rate") * 100).toFixed(2)}% for this comparison.`,
+      ...amortisation.assumptions,
     ],
   };
 }
@@ -283,25 +299,39 @@ router.post("/affordability", async (req, res): Promise<void> => {
 
 router.post("/rent-vs-buy", (req, res) => {
   const input = CompareRentVsBuyBody.parse(req.body);
-  const downPayment = input.homePrice * 0.2;
-  const fees = input.homePrice * 0.065;
+  const mortgagePrincipal = input.homePrice * ruleNumber(
+    input.homePrice <= ruleNumber("mortgage_property_value_threshold")
+      ? "mortgage_expat_first_home_ltv_upto_5m"
+      : "mortgage_expat_first_home_ltv_above_5m",
+  );
+  const purchaseCosts = calculateDubaiPurchaseCosts({
+    propertyPrice: input.homePrice,
+    mortgagePrincipal,
+  });
+  const fees = purchaseCosts.total;
+  const downPayment = input.homePrice - mortgagePrincipal;
   const dayOneCash = downPayment + fees;
-  const mortgagePayment = monthlyPayment(input.homePrice * 0.8, 4.5, 300);
-  const monthlyOwning = mortgagePayment + 1_200;
+  const mortgagePayment = calculateAmortisation({
+    principal: mortgagePrincipal,
+    annualRatePct: ruleNumber("rent_buy_default_mortgage_rate") * 100,
+    tenorMonths: ruleNumber("rent_buy_default_mortgage_term_months"),
+    rateType: "reducing",
+  }).installment;
+  const monthlyOwning = mortgagePayment + ruleNumber("rent_buy_service_charge_monthly");
   const annualRent = input.monthlyRent * 12;
   const annualOwning = monthlyOwning * 12;
-  const breakEvenYear = Math.max(3, Math.round(dayOneCash / Math.max(1, annualRent - annualOwning)));
+  const breakEvenYear = Math.max(ruleNumber("rent_buy_break_even_floor_years"), Math.round(dayOneCash / Math.max(1, annualRent - annualOwning)));
   const horizon = input.yearsToStay;
   const priceScenarios = [
-    { label: "Flat prices", growth: 0 },
-    { label: "+3% / year", growth: 0.03 },
-    { label: "−10% shock", growth: -0.1 },
+    { label: "Flat prices", growth: ruleNumber("rent_buy_flat_price_growth") },
+    { label: "+3% / year", growth: ruleNumber("rent_buy_positive_price_growth") },
+    { label: "−10% shock", growth: ruleNumber("rent_buy_price_shock") },
   ];
   const scenarios = priceScenarios.map(({ label, growth }) => ({
     label,
     netPosition: Math.round(input.homePrice * ((1 + growth) ** horizon - 1) - dayOneCash - Math.max(0, annualOwning - annualRent) * horizon),
   }));
-  const verdict = input.yearsToStay >= breakEvenYear + 2 ? "buy" : input.yearsToStay >= breakEvenYear ? "buy-if" : "rent-for-now";
+  const verdict = input.yearsToStay >= breakEvenYear + ruleNumber("rent_buy_verdict_margin_years") ? "buy" : input.yearsToStay >= breakEvenYear ? "buy-if" : "rent-for-now";
 
   res.json(CompareRentVsBuyResponse.parse({
     verdict,
@@ -317,11 +347,22 @@ router.post("/rent-vs-buy", (req, res) => {
     scenarios,
     flipFactor: input.yearsToStay < breakEvenYear
       ? `Staying ${breakEvenYear - input.yearsToStay} more year(s) is the clearest flip factor.`
-      : "A 15% price drop or a shorter stay would flip this result.",
+      : `A ${Math.abs(ruleNumber("rent_buy_price_shock") * 100).toFixed(0)}% price shock or a shorter stay would flip this result.`,
     assumptions: [
-      "First-home down payment is 20% for a property under AED 5m.",
-      "Fees are modelled at 6.5%: DLD, agent, registration, trustee, valuation, and bank fee.",
-      "Ownership includes AED 1,200/month service charge and a 4.5% reducing mortgage over 25 years.",
+       ...ruleAssumption(
+         "mortgage_property_value_threshold",
+         "mortgage_expat_first_home_ltv_upto_5m",
+         "mortgage_expat_first_home_ltv_above_5m",
+         "rent_buy_default_mortgage_rate",
+         "rent_buy_default_mortgage_term_months",
+         "rent_buy_service_charge_monthly",
+         "rent_buy_break_even_floor_years",
+         "rent_buy_verdict_margin_years",
+         "rent_buy_flat_price_growth",
+         "rent_buy_positive_price_growth",
+         "rent_buy_price_shock",
+       ),
+       ...purchaseCosts.assumptions,
     ],
   }));
 });
