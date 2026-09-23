@@ -592,3 +592,57 @@ export interface StressResult {
   headline: string;
 }
 
+export type AgentChatMessageRole = typeof AgentChatMessageRole[keyof typeof AgentChatMessageRole];
+
+
+export const AgentChatMessageRole = {
+  user: 'user',
+  assistant: 'assistant',
+} as const;
+
+export interface AgentChatMessage {
+  id: string;
+  role: AgentChatMessageRole;
+  /**
+     * @minLength 1
+     * @maxLength 2000
+     */
+  content: string;
+  createdAt: string;
+}
+
+export interface AgentChatRequest {
+  conversationId?: string;
+  /**
+     * @minItems 1
+     * @maxItems 8
+     */
+  messages: AgentChatMessage[];
+}
+
+export interface AgentProposedAction {
+  summary: string;
+  /** @nullable */
+  details?: string | null;
+}
+
+export type AgentChatResponseOutcome = typeof AgentChatResponseOutcome[keyof typeof AgentChatResponseOutcome];
+
+
+export const AgentChatResponseOutcome = {
+  answer: 'answer',
+  needs_input: 'needs_input',
+  out_of_scope: 'out_of_scope',
+  proposed_action: 'proposed_action',
+  error: 'error',
+} as const;
+
+export interface AgentChatResponse {
+  conversationId: string;
+  outcome: AgentChatResponseOutcome;
+  message: AgentChatMessage;
+  /** @nullable */
+  missingQuestion: string | null;
+  proposedAction: AgentProposedAction | null;
+}
+

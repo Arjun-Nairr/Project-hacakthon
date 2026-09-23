@@ -4,6 +4,7 @@ import moneyRouter from "./money";
 import importsRouter from "./imports";
 import storageRouter from "./storage";
 import profileRouter from "./profile";
+import agentRouter from "./agent";
 
 const router: IRouter = Router();
 
@@ -12,5 +13,6 @@ router.use(moneyRouter);
 router.use(importsRouter);
 router.use(storageRouter);
 router.use(profileRouter);
+router.use(agentRouter);
 
 export default router;

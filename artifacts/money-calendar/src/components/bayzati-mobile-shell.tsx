@@ -80,12 +80,12 @@ export function BayzatiMobileShell({
             </Link>
           ))}
         </nav>
-        <button type="button" disabled aria-label="Quick action reserved for a future integration" className="grid size-[70px] shrink-0 place-items-center rounded-full border border-white/80 bg-white/85 shadow-[0_8px_24px_rgba(0,46,93,.14)] backdrop-blur-xl" data-testid="button-reserved-quick-action">
+        <Link href="/chat" aria-label="Open finance assistant" className="grid size-[70px] shrink-0 place-items-center rounded-full border border-white/80 bg-white/85 shadow-[0_8px_24px_rgba(0,46,93,.14)] backdrop-blur-xl" data-testid="button-reserved-quick-action">
           <span className="relative grid size-[58px] place-items-center rounded-full border border-[#E4E7EC] text-[#003B73]">
             <Sparkles size={20} />
             <i className="absolute right-[12px] top-[10px] size-1.5 rounded-full bg-[#D20A58]" />
           </span>
-        </button>
+        </Link>
       </div>
 
       {panel && (

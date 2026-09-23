@@ -18,6 +18,8 @@ tags:
     description: Household profile inputs for the financial plan
   - name: Storage
     description: Object storage upload and serving endpoints.
+  - name: agent
+    description: Read-only Hermes chat path grounded in existing financial data
 paths:
   /healthz:
     get:
@@ -233,6 +235,25 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/StressResult"
+  /agent/chat:
+    post:
+      operationId: postAgentChat
+      tags: [agent]
+      summary: Read-only Hermes chat turn grounded in existing financial data
+      description: Builds compact server-side financial context and sends it plus a bounded recent-message window to the isolated uae-finance Hermes profile. Hermes explains or proposes only; it never mutates state in this block.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AgentChatRequest"
+      responses:
+        "200":
+          description: Structured agent turn
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgentChatResponse"
 components:
   schemas:
     HealthStatus:
@@ -632,4 +653,45 @@ components:
         stressedMonthlyCommitment: { type: number }
         endingBuffer: { type: number }
         headline: { type: string }
+    AgentChatMessage:
+      type: object
+      required: [id, role, content, createdAt]
+      properties:
+        id: { type: string }
+        role:
+          type: string
+          enum: [user, assistant]
+        content: { type: string, minLength: 1, maxLength: 2000 }
+        createdAt: { type: string, format: date-time }
+    AgentChatRequest:
+      type: object
+      required: [messages]
+      properties:
+        conversationId: { type: string }
+        messages:
+          type: array
+          minItems: 1
+          maxItems: 8
+          items: { $ref: "#/components/schemas/AgentChatMessage" }
+    AgentProposedAction:
+      type: object
+      required: [summary]
+      properties:
+        summary: { type: string }
+        details: { type: ["string", "null"] }
+    AgentChatResponse:
+      type: object
+      required: [conversationId, outcome, message, missingQuestion, proposedAction]
+      properties:
+        conversationId: { type: string }
+        outcome:
+          type: string
+          enum: [answer, needs_input, out_of_scope, proposed_action, error]
+        message:
+          $ref: "#/components/schemas/AgentChatMessage"
+        missingQuestion: { type: ["string", "null"] }
+        proposedAction:
+          oneOf:
+            - $ref: "#/components/schemas/AgentProposedAction"
+            - type: "null"
 

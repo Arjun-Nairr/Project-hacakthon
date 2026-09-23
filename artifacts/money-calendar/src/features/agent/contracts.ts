@@ -21,9 +21,19 @@ export interface AgentRequest {
   financialContext: AgentFinancialContext;
 }
 
+export type AgentOutcome = 'answer' | 'needs_input' | 'out_of_scope' | 'proposed_action' | 'error';
+
+export interface AgentProposedAction {
+  summary: string;
+  details: string | null;
+}
+
 export interface AgentResponse {
   conversationId: string;
+  outcome: AgentOutcome;
   message: AgentMessage;
+  missingQuestion: string | null;
+  proposedAction: AgentProposedAction | null;
 }
 
 export interface AgentGateway {

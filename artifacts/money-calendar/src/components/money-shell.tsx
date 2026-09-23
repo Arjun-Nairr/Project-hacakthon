@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { BarChart3, CalendarDays, ChevronRight, Home, ShieldCheck, Target } from 'lucide-react';
+import { BarChart3, CalendarDays, ChevronRight, Home, MessageCircle, ShieldCheck, Target } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 
 const navItems = [
@@ -7,6 +7,7 @@ const navItems = [
   { href: '/', label: 'Plan', icon: CalendarDays },
   { href: '/goals', label: 'Goals', icon: Target },
   { href: '/calendar', label: 'Calendar', icon: CalendarDays },
+  { href: '/chat', label: 'Chat', icon: MessageCircle },
 ];
 
 export function MoneyShell({ children }: { children: ReactNode }) {

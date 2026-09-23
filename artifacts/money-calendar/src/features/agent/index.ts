@@ -3,6 +3,8 @@ export type {
   AgentGateway,
   AgentMessage,
   AgentMessageRole,
+  AgentOutcome,
+  AgentProposedAction,
   AgentRequest,
   AgentResponse,
 } from './contracts';

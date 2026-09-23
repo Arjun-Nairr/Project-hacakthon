@@ -692,3 +692,44 @@ export const RunStressTestResponse = zod.object({
 })
 
 
+/**
+ * Builds compact server-side financial context and sends it plus a bounded recent-message window to the isolated uae-finance Hermes profile. Hermes explains or proposes only; it never mutates state in this block.
+ * @summary Read-only Hermes chat turn grounded in existing financial data
+ */
+export const postAgentChatBodyMessagesItemContentMax = 2000;
+
+export const postAgentChatBodyMessagesMax = 8;
+
+
+
+export const PostAgentChatBody = zod.object({
+  "conversationId": zod.string().optional(),
+  "messages": zod.array(zod.object({
+  "id": zod.string(),
+  "role": zod.enum(['user', 'assistant']),
+  "content": zod.string().min(1).max(postAgentChatBodyMessagesItemContentMax),
+  "createdAt": zod.coerce.date()
+})).min(1).max(postAgentChatBodyMessagesMax)
+})
+
+export const postAgentChatResponseMessageContentMax = 2000;
+
+
+
+export const PostAgentChatResponse = zod.object({
+  "conversationId": zod.string(),
+  "outcome": zod.enum(['answer', 'needs_input', 'out_of_scope', 'proposed_action', 'error']),
+  "message": zod.object({
+  "id": zod.string(),
+  "role": zod.enum(['user', 'assistant']),
+  "content": zod.string().min(1).max(postAgentChatResponseMessageContentMax),
+  "createdAt": zod.coerce.date()
+}),
+  "missingQuestion": zod.string().nullable(),
+  "proposedAction": zod.union([zod.object({
+  "summary": zod.string(),
+  "details": zod.string().nullish()
+}),zod.null()])
+})
+
+

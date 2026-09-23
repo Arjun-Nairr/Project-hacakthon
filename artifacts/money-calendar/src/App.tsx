@@ -9,6 +9,7 @@ import LoanPage from '@/pages/loan';
 import MoneyCalendarPage from '@/pages/money-calendar';
 import GoalsPage from '@/pages/goals';
 import CalendarPage from '@/pages/calendar';
+import ChatPage from '@/pages/chat';
 import OnboardingPage from '@/pages/onboarding';
 import NotFound from '@/pages/not-found';
 import ImportHub from '@/components/import-hub';
@@ -34,6 +35,7 @@ function Router() {
           <Route path="/home" component={HomePage} />
           <Route path="/goals" component={GoalsPage} />
           <Route path="/calendar" component={CalendarPage} />
+          <Route path="/chat" component={ChatPage} />
           <Route path="/imports" component={ImportHub} />
           <Route component={NotFound} />
         </Switch>

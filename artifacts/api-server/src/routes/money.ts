@@ -158,7 +158,7 @@ const baseFinancialFacts: FinancialFacts = {
   events: eventDefinitions,
 };
 
-async function buildCalendar() {
+export async function buildCalendar() {
   const profile = await getFinancialProfile();
   const baseFacts = profile ? profileToFinancialFacts(profile) : baseFinancialFacts;
   const events = [...baseFacts.events, ...(await getAcceptedImportedEvents())].sort((a, b) => a.day - b.day);
