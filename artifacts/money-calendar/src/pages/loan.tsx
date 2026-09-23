@@ -89,11 +89,11 @@ export default function LoanPage() {
     <BayzatiMobileShell active="plan">
       <div data-testid="page-loan">
         <header className="mt-7 flex items-start gap-3">
-          <Link href="/" className="mt-1 grid size-9 shrink-0 place-items-center rounded-full border border-[#E4E7EC] bg-white text-[#667085] transition-colors hover:text-[#003B73]" data-testid="link-back-calendar">
+          <Link href="/" className="mt-1 grid size-9 shrink-0 place-items-center rounded-full border border-[#E4E7EC] bg-white text-[#667085] transition-colors hover:text-[#003B73]" data-testid="link-back-plan">
             <ArrowLeft className="size-4" />
           </Link>
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[.16em] text-[#667085]">Decision 01 / Borrowing</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[.16em] text-[#667085]">Decision 02 / Borrowing</p>
             <h1 className="mt-1 text-[28px] font-bold leading-none tracking-[-.04em] text-[#003B73]">Can I safely borrow?</h1>
             <p className="mt-3 text-[12px] leading-5 text-[#667085]">We check UAE legal limits, your month-by-month cash flow, and the buffer left after upfront cash.</p>
           </div>
