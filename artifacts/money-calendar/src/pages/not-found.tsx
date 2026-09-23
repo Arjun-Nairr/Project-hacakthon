@@ -1,23 +1,15 @@
-import { Card, CardContent } from '@/components/ui/card';
-import { AlertCircle } from 'lucide-react';
+import { ArrowLeft, CircleAlert } from 'lucide-react';
+import { Link } from 'wouter';
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gray-50">
-      <Card className="w-full max-w-md mx-4">
-        <CardContent className="pt-6">
-          <div className="flex mb-4 gap-2">
-            <AlertCircle className="h-8 w-8 text-red-500" />
-            <h1 className="text-2xl font-bold text-gray-900">
-              404 Page Not Found
-            </h1>
-          </div>
-
-          <p className="mt-4 text-sm text-gray-600">
-            Did you forget to add the page to the router?
-          </p>
-        </CardContent>
-      </Card>
+    <div className="flex min-h-[60vh] w-full items-center justify-center">
+      <div className="mx-4 w-full max-w-md rounded-2xl border border-border bg-card p-8 shadow-sm" data-testid="error-not-found">
+        <CircleAlert className="mb-5 size-8 text-primary" />
+        <h1 className="font-display text-4xl text-primary">This page wandered off.</h1>
+        <p className="mt-3 text-sm leading-6 text-muted-foreground">There is no money decision at this address. The calendar is still right where you left it.</p>
+        <Link href="/" className="mt-6 inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground" data-testid="link-not-found-home"><ArrowLeft className="size-4" />Back to calendar</Link>
+      </div>
     </div>
   );
 }

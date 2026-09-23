@@ -1,6 +1,6 @@
-# [Project name]
+# Money Calendar
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+An auditable UAE personal finance demo that turns a household's cash flow into a money calendar, loan affordability checks, and rent-vs-buy analysis.
 
 ## Run & Operate
 
@@ -22,15 +22,21 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/money-calendar` — React/Vite web app with the calendar, borrowing, and rent-vs-buy flows.
+- `artifacts/api-server/src/routes/money.ts` — hand-written money engine and demo API endpoints.
+- `lib/api-spec/openapi.yaml` — source of truth for the typed money API contract.
+- `lib/api-client-react` and `lib/api-zod` — generated API hooks and validation schemas.
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- Calculations stay in the API server; the UI only collects inputs and renders auditable outputs.
+- The seeded persona is intentionally a salaried expat with two rent cheques, school fees, and an existing car loan so the demo has a tight month immediately.
+- The affordability verdict uses the worst calendar month, not an average month, and applies the CBUAE-style recognized-income rules.
+- The frontend uses the same calendar data for the dashboard, loan checks, and home decision handoff.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+The user can open a seeded September cash-flow calendar, see safe-to-spend and the tightest day, run a UAE loan affordability check across legal/calendar/resilience tests, compare rent versus buy across three price scenarios, run a no-income stress check, and hold a home decision for calendar review.
 
 ## User preferences
 
