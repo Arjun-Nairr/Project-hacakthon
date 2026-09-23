@@ -62,11 +62,300 @@ export const GetMoneyCalendarResponse = zod.object({
   "amountType": zod.enum(['fixed', 'variable', 'range']),
   "accountName": zod.string(),
   "reviewed": zod.boolean(),
+  "source": zod.string(),
+  "freshness": zod.coerce.date(),
   "balanceAfter": zod.number().nullish(),
   "note": zod.string().nullish()
 })),
   "assumptions": zod.array(zod.string())
 })
+
+
+/**
+ * @summary Get the saved household profile
+ */
+
+
+
+
+
+
+export const getFinancialProfileResponseOneOneDependentsMin = 0;
+
+export const getFinancialProfileResponseOneOneBasicSalaryExclusiveMin = 0;
+
+export const getFinancialProfileResponseOneOneHousingAllowanceMin = 0;
+
+export const getFinancialProfileResponseOneOneVariableIncomeMin = 0;
+
+
+export const getFinancialProfileResponseOneOnePaydayMax = 31;
+
+export const getFinancialProfileResponseOneOneAvailableBalanceMin = 0;
+
+
+
+export const getFinancialProfileResponseOneOneCommitmentsItemAmountMin = 0;
+
+export const getFinancialProfileResponseOneOneCommitmentsItemDayMax = 31;
+
+
+
+export const getFinancialProfileResponseOneOneGoalsItemTargetMin = 0;
+
+export const getFinancialProfileResponseOneOneGoalsItemDateRegExp = new RegExp('^[0-9]{4}-[0-9]{2}$');
+export const getFinancialProfileResponseOneOneBufferAmountMin = 0;
+
+
+export const getFinancialProfileResponseOneTwoCommitmentsItemOneAmountMin = 0;
+
+export const getFinancialProfileResponseOneTwoCommitmentsItemOneDayMax = 31;
+
+
+
+export const getFinancialProfileResponseOneTwoGoalsItemOneTargetMin = 0;
+
+export const getFinancialProfileResponseOneTwoGoalsItemOneDateRegExp = new RegExp('^[0-9]{4}-[0-9]{2}$');
+
+
+export const GetFinancialProfileResponse = zod.union([zod.object({
+  "country": zod.string().min(1),
+  "emirate": zod.string().min(1),
+  "residency": zod.string().min(1),
+  "employment": zod.string().min(1),
+  "householdType": zod.string().min(1),
+  "adults": zod.number().int().min(1),
+  "dependents": zod.number().int().min(getFinancialProfileResponseOneOneDependentsMin),
+  "basicSalary": zod.number().gt(getFinancialProfileResponseOneOneBasicSalaryExclusiveMin),
+  "housingAllowance": zod.number().min(getFinancialProfileResponseOneOneHousingAllowanceMin),
+  "variableIncome": zod.number().min(getFinancialProfileResponseOneOneVariableIncomeMin),
+  "payFrequency": zod.string().min(1),
+  "payday": zod.number().int().min(1).max(getFinancialProfileResponseOneOnePaydayMax),
+  "availableBalance": zod.number().min(getFinancialProfileResponseOneOneAvailableBalanceMin),
+  "mainAccount": zod.string().min(1),
+  "commitments": zod.array(zod.object({
+  "name": zod.string().min(1),
+  "amount": zod.number().min(getFinancialProfileResponseOneOneCommitmentsItemAmountMin),
+  "day": zod.number().int().min(1).max(getFinancialProfileResponseOneOneCommitmentsItemDayMax),
+  "category": zod.string().min(1),
+  "confidence": zod.enum(['high', 'medium', 'low'])
+})),
+  "goals": zod.array(zod.object({
+  "name": zod.string().min(1),
+  "target": zod.number().min(getFinancialProfileResponseOneOneGoalsItemTargetMin),
+  "date": zod.string().regex(getFinancialProfileResponseOneOneGoalsItemDateRegExp),
+  "priority": zod.enum(['high', 'medium', 'low']),
+  "confidence": zod.enum(['high', 'medium', 'low']).optional()
+})),
+  "bufferPreference": zod.enum(['recommended', 'custom']),
+  "bufferAmount": zod.number().min(getFinancialProfileResponseOneOneBufferAmountMin)
+}).and(zod.object({
+  "id": zod.string(),
+  "confidence": zod.enum(['high', 'medium', 'low']),
+  "source": zod.string(),
+  "reviewed": zod.boolean(),
+  "freshness": zod.coerce.date(),
+  "commitments": zod.array(zod.object({
+  "name": zod.string().min(1),
+  "amount": zod.number().min(getFinancialProfileResponseOneTwoCommitmentsItemOneAmountMin),
+  "day": zod.number().int().min(1).max(getFinancialProfileResponseOneTwoCommitmentsItemOneDayMax),
+  "category": zod.string().min(1),
+  "confidence": zod.enum(['high', 'medium', 'low'])
+}).and(zod.object({
+  "source": zod.string(),
+  "reviewed": zod.boolean(),
+  "freshness": zod.coerce.date()
+}))),
+  "goals": zod.array(zod.object({
+  "name": zod.string().min(1),
+  "target": zod.number().min(getFinancialProfileResponseOneTwoGoalsItemOneTargetMin),
+  "date": zod.string().regex(getFinancialProfileResponseOneTwoGoalsItemOneDateRegExp),
+  "priority": zod.enum(['high', 'medium', 'low']),
+  "confidence": zod.enum(['high', 'medium', 'low'])
+}).and(zod.object({
+  "confidence": zod.enum(['high', 'medium', 'low']),
+  "source": zod.string(),
+  "reviewed": zod.boolean(),
+  "freshness": zod.coerce.date()
+})))
+})),zod.null()])
+
+
+/**
+ * @summary Validate and save the household profile
+ */
+
+
+
+
+
+
+export const saveFinancialProfileBodyDependentsMin = 0;
+
+export const saveFinancialProfileBodyBasicSalaryExclusiveMin = 0;
+
+export const saveFinancialProfileBodyHousingAllowanceMin = 0;
+
+export const saveFinancialProfileBodyVariableIncomeMin = 0;
+
+
+export const saveFinancialProfileBodyPaydayMax = 31;
+
+export const saveFinancialProfileBodyAvailableBalanceMin = 0;
+
+
+
+export const saveFinancialProfileBodyCommitmentsItemAmountMin = 0;
+
+export const saveFinancialProfileBodyCommitmentsItemDayMax = 31;
+
+
+
+export const saveFinancialProfileBodyGoalsItemTargetMin = 0;
+
+export const saveFinancialProfileBodyGoalsItemDateRegExp = new RegExp('^[0-9]{4}-[0-9]{2}$');
+export const saveFinancialProfileBodyBufferAmountMin = 0;
+
+
+
+export const SaveFinancialProfileBody = zod.object({
+  "country": zod.string().min(1),
+  "emirate": zod.string().min(1),
+  "residency": zod.string().min(1),
+  "employment": zod.string().min(1),
+  "householdType": zod.string().min(1),
+  "adults": zod.number().int().min(1),
+  "dependents": zod.number().int().min(saveFinancialProfileBodyDependentsMin),
+  "basicSalary": zod.number().gt(saveFinancialProfileBodyBasicSalaryExclusiveMin),
+  "housingAllowance": zod.number().min(saveFinancialProfileBodyHousingAllowanceMin),
+  "variableIncome": zod.number().min(saveFinancialProfileBodyVariableIncomeMin),
+  "payFrequency": zod.string().min(1),
+  "payday": zod.number().int().min(1).max(saveFinancialProfileBodyPaydayMax),
+  "availableBalance": zod.number().min(saveFinancialProfileBodyAvailableBalanceMin),
+  "mainAccount": zod.string().min(1),
+  "commitments": zod.array(zod.object({
+  "name": zod.string().min(1),
+  "amount": zod.number().min(saveFinancialProfileBodyCommitmentsItemAmountMin),
+  "day": zod.number().int().min(1).max(saveFinancialProfileBodyCommitmentsItemDayMax),
+  "category": zod.string().min(1),
+  "confidence": zod.enum(['high', 'medium', 'low'])
+})),
+  "goals": zod.array(zod.object({
+  "name": zod.string().min(1),
+  "target": zod.number().min(saveFinancialProfileBodyGoalsItemTargetMin),
+  "date": zod.string().regex(saveFinancialProfileBodyGoalsItemDateRegExp),
+  "priority": zod.enum(['high', 'medium', 'low']),
+  "confidence": zod.enum(['high', 'medium', 'low']).optional()
+})),
+  "bufferPreference": zod.enum(['recommended', 'custom']),
+  "bufferAmount": zod.number().min(saveFinancialProfileBodyBufferAmountMin)
+})
+
+
+
+
+
+
+
+export const saveFinancialProfileResponseOneDependentsMin = 0;
+
+export const saveFinancialProfileResponseOneBasicSalaryExclusiveMin = 0;
+
+export const saveFinancialProfileResponseOneHousingAllowanceMin = 0;
+
+export const saveFinancialProfileResponseOneVariableIncomeMin = 0;
+
+
+export const saveFinancialProfileResponseOnePaydayMax = 31;
+
+export const saveFinancialProfileResponseOneAvailableBalanceMin = 0;
+
+
+
+export const saveFinancialProfileResponseOneCommitmentsItemAmountMin = 0;
+
+export const saveFinancialProfileResponseOneCommitmentsItemDayMax = 31;
+
+
+
+export const saveFinancialProfileResponseOneGoalsItemTargetMin = 0;
+
+export const saveFinancialProfileResponseOneGoalsItemDateRegExp = new RegExp('^[0-9]{4}-[0-9]{2}$');
+export const saveFinancialProfileResponseOneBufferAmountMin = 0;
+
+
+export const saveFinancialProfileResponseTwoCommitmentsItemOneAmountMin = 0;
+
+export const saveFinancialProfileResponseTwoCommitmentsItemOneDayMax = 31;
+
+
+
+export const saveFinancialProfileResponseTwoGoalsItemOneTargetMin = 0;
+
+export const saveFinancialProfileResponseTwoGoalsItemOneDateRegExp = new RegExp('^[0-9]{4}-[0-9]{2}$');
+
+
+export const SaveFinancialProfileResponse = zod.object({
+  "country": zod.string().min(1),
+  "emirate": zod.string().min(1),
+  "residency": zod.string().min(1),
+  "employment": zod.string().min(1),
+  "householdType": zod.string().min(1),
+  "adults": zod.number().int().min(1),
+  "dependents": zod.number().int().min(saveFinancialProfileResponseOneDependentsMin),
+  "basicSalary": zod.number().gt(saveFinancialProfileResponseOneBasicSalaryExclusiveMin),
+  "housingAllowance": zod.number().min(saveFinancialProfileResponseOneHousingAllowanceMin),
+  "variableIncome": zod.number().min(saveFinancialProfileResponseOneVariableIncomeMin),
+  "payFrequency": zod.string().min(1),
+  "payday": zod.number().int().min(1).max(saveFinancialProfileResponseOnePaydayMax),
+  "availableBalance": zod.number().min(saveFinancialProfileResponseOneAvailableBalanceMin),
+  "mainAccount": zod.string().min(1),
+  "commitments": zod.array(zod.object({
+  "name": zod.string().min(1),
+  "amount": zod.number().min(saveFinancialProfileResponseOneCommitmentsItemAmountMin),
+  "day": zod.number().int().min(1).max(saveFinancialProfileResponseOneCommitmentsItemDayMax),
+  "category": zod.string().min(1),
+  "confidence": zod.enum(['high', 'medium', 'low'])
+})),
+  "goals": zod.array(zod.object({
+  "name": zod.string().min(1),
+  "target": zod.number().min(saveFinancialProfileResponseOneGoalsItemTargetMin),
+  "date": zod.string().regex(saveFinancialProfileResponseOneGoalsItemDateRegExp),
+  "priority": zod.enum(['high', 'medium', 'low']),
+  "confidence": zod.enum(['high', 'medium', 'low']).optional()
+})),
+  "bufferPreference": zod.enum(['recommended', 'custom']),
+  "bufferAmount": zod.number().min(saveFinancialProfileResponseOneBufferAmountMin)
+}).and(zod.object({
+  "id": zod.string(),
+  "confidence": zod.enum(['high', 'medium', 'low']),
+  "source": zod.string(),
+  "reviewed": zod.boolean(),
+  "freshness": zod.coerce.date(),
+  "commitments": zod.array(zod.object({
+  "name": zod.string().min(1),
+  "amount": zod.number().min(saveFinancialProfileResponseTwoCommitmentsItemOneAmountMin),
+  "day": zod.number().int().min(1).max(saveFinancialProfileResponseTwoCommitmentsItemOneDayMax),
+  "category": zod.string().min(1),
+  "confidence": zod.enum(['high', 'medium', 'low'])
+}).and(zod.object({
+  "source": zod.string(),
+  "reviewed": zod.boolean(),
+  "freshness": zod.coerce.date()
+}))),
+  "goals": zod.array(zod.object({
+  "name": zod.string().min(1),
+  "target": zod.number().min(saveFinancialProfileResponseTwoGoalsItemOneTargetMin),
+  "date": zod.string().regex(saveFinancialProfileResponseTwoGoalsItemOneDateRegExp),
+  "priority": zod.enum(['high', 'medium', 'low']),
+  "confidence": zod.enum(['high', 'medium', 'low'])
+}).and(zod.object({
+  "confidence": zod.enum(['high', 'medium', 'low']),
+  "source": zod.string(),
+  "reviewed": zod.boolean(),
+  "freshness": zod.coerce.date()
+})))
+}))
 
 
 /**
@@ -95,6 +384,8 @@ export const ListImportsResponse = zod.object({
   "amountType": zod.enum(['fixed', 'variable', 'range']),
   "accountName": zod.string(),
   "reviewed": zod.boolean(),
+  "source": zod.string(),
+  "freshness": zod.coerce.date(),
   "balanceAfter": zod.number().nullish(),
   "note": zod.string().nullish()
 }),
@@ -193,6 +484,8 @@ export const CreateDocumentImportResponse = zod.object({
   "amountType": zod.enum(['fixed', 'variable', 'range']),
   "accountName": zod.string(),
   "reviewed": zod.boolean(),
+  "source": zod.string(),
+  "freshness": zod.coerce.date(),
   "balanceAfter": zod.number().nullish(),
   "note": zod.string().nullish()
 }),
@@ -235,6 +528,8 @@ export const ReviewImportedRecordResponse = zod.object({
   "amountType": zod.enum(['fixed', 'variable', 'range']),
   "accountName": zod.string(),
   "reviewed": zod.boolean(),
+  "source": zod.string(),
+  "freshness": zod.coerce.date(),
   "balanceAfter": zod.number().nullish(),
   "note": zod.string().nullish()
 }),

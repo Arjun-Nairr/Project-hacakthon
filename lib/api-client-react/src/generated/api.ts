@@ -25,6 +25,8 @@ import type {
   AffordabilityInput,
   AffordabilityResult,
   DocumentImportInput,
+  FinancialProfile,
+  FinancialProfileInput,
   HealthStatus,
   ImportReviewInput,
   ImportReviewQueue,
@@ -220,6 +222,171 @@ export function useGetMoneyCalendar<TData = Awaited<ReturnType<typeof getMoneyCa
 
 
 
+
+export const getGetFinancialProfileUrl = () => {
+
+
+
+
+  return `/api/profile`
+}
+
+/**
+ * @summary Get the saved household profile
+ */
+export const getFinancialProfile = async ( options?: Parameters<typeof customFetch>[1]): Promise<FinancialProfile | null> => {
+
+  return customFetch<FinancialProfile | null>(getGetFinancialProfileUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetFinancialProfileQueryKey = () => {
+    return [
+    `/api/profile`
+    ] as const;
+    }
+
+
+export const getGetFinancialProfileQueryOptions = <TData = Awaited<ReturnType<typeof getFinancialProfile>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getFinancialProfile>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetFinancialProfileQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getFinancialProfile>>> = ({ signal }) => getFinancialProfile({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getFinancialProfile>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetFinancialProfileQueryResult = NonNullable<Awaited<ReturnType<typeof getFinancialProfile>>>
+export type GetFinancialProfileQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get the saved household profile
+ */
+
+export function useGetFinancialProfile<TData = Awaited<ReturnType<typeof getFinancialProfile>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getFinancialProfile>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetFinancialProfileQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getSaveFinancialProfileUrl = () => {
+
+
+
+
+  return `/api/profile`
+}
+
+/**
+ * @summary Validate and save the household profile
+ */
+export const saveFinancialProfile = async (financialProfileInput: FinancialProfileInput, options?: Parameters<typeof customFetch>[1]): Promise<FinancialProfile> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<FinancialProfile>(getSaveFinancialProfileUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(financialProfileInput)
+  }
+);}
+
+
+
+
+
+export const getSaveFinancialProfileMutationKey = () => ['saveFinancialProfile'] as const;
+
+export const getSaveFinancialProfileMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveFinancialProfile>>, TError,SaveFinancialProfileMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof saveFinancialProfile>>, TError,SaveFinancialProfileMutationVariables, TContext> => {
+
+const mutationKey = getSaveFinancialProfileMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof saveFinancialProfile>>, SaveFinancialProfileMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  saveFinancialProfile(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SaveFinancialProfileMutationResult = NonNullable<Awaited<ReturnType<typeof saveFinancialProfile>>>
+    export type SaveFinancialProfileMutationBody = BodyType<FinancialProfileInput>
+    export type SaveFinancialProfileMutationError = ErrorType<unknown>
+    export type SaveFinancialProfileMutationVariables = {data: BodyType<FinancialProfileInput>}
+
+    /**
+ * @summary Validate and save the household profile
+ */
+export const useSaveFinancialProfile = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveFinancialProfile>>, TError,SaveFinancialProfileMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof saveFinancialProfile>>,
+        TError,
+        SaveFinancialProfileMutationVariables,
+        TContext
+      > => {
+      return useMutation(getSaveFinancialProfileMutationOptions(options));
+    }
 
 export const getListImportsUrl = () => {
 

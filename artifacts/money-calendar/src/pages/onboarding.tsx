@@ -1,6 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, ArrowRight, Check, ChevronDown, CircleHelp, Landmark, LockKeyhole, Plus, RotateCcw, ShieldCheck, Trash2 } from 'lucide-react';
 import { useLocation } from 'wouter';
+import { useQueryClient } from '@tanstack/react-query';
+import {
+  getGetFinancialProfileQueryKey,
+  getGetMoneyCalendarQueryKey,
+  useGetFinancialProfile,
+  useSaveFinancialProfile,
+  type FinancialProfile,
+  type FinancialProfileInput,
+} from '@workspace/api-client-react';
 
 type Commitment = {
   name: string;
@@ -92,6 +101,29 @@ function readDraft(): { profile: Profile; step: Step } | null {
   }
 }
 
+function toLocalProfile(savedProfile: FinancialProfile): Profile {
+  return {
+    country: savedProfile.country,
+    emirate: savedProfile.emirate,
+    residency: savedProfile.residency,
+    employment: savedProfile.employment,
+    householdType: savedProfile.householdType,
+    adults: savedProfile.adults,
+    dependents: savedProfile.dependents,
+    basicSalary: savedProfile.basicSalary,
+    housingAllowance: savedProfile.housingAllowance,
+    variableIncome: savedProfile.variableIncome,
+    payFrequency: savedProfile.payFrequency,
+    payday: savedProfile.payday,
+    availableBalance: savedProfile.availableBalance,
+    mainAccount: savedProfile.mainAccount,
+    commitments: savedProfile.commitments.map(({ name, amount, day, category, confidence }) => ({ name, amount, day, category, confidence })),
+    goals: savedProfile.goals.map(({ name, target, date, priority }) => ({ name, target, date, priority })),
+    bufferPreference: savedProfile.bufferPreference,
+    bufferAmount: savedProfile.bufferAmount,
+  };
+}
+
 function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return <label className="block text-[12px] font-semibold text-[#536273]">{label}{hint && <span className="ml-1 font-normal text-[#98A2B3]">{hint}</span>}{children}</label>;
 }
@@ -118,6 +150,9 @@ export default function OnboardingPage() {
   const [profile, setProfile] = useState<Profile>(saved?.profile ?? initialProfile);
   const [step, setStep] = useState<Step>(saved?.step ?? 'context');
   const [error, setError] = useState('');
+  const queryClient = useQueryClient();
+  const { data: savedProfile } = useGetFinancialProfile();
+  const saveProfile = useSaveFinancialProfile();
   const currentIndex = steps.findIndex((item) => item.id === step);
   const current = steps[currentIndex] ?? steps[0];
   const progress = Math.round(((currentIndex + 1) / steps.length) * 100);
@@ -125,6 +160,10 @@ export default function OnboardingPage() {
   useEffect(() => {
     window.localStorage.setItem(draftKey, JSON.stringify({ profile, step }));
   }, [profile, step]);
+
+  useEffect(() => {
+    if (!saved && savedProfile) setProfile(toLocalProfile(savedProfile));
+  }, [saved, savedProfile]);
 
   const update = <K extends keyof Profile>(key: K, value: Profile[K]) => setProfile((currentValue) => ({ ...currentValue, [key]: value }));
   const updateCommitment = (index: number, patch: Partial<Commitment>) => update('commitments', profile.commitments.map((item, itemIndex) => itemIndex === index ? { ...item, ...patch } : item));
@@ -143,7 +182,7 @@ export default function OnboardingPage() {
     return '';
   };
 
-  const next = () => {
+  const next = async () => {
     const validation = validate();
     if (validation) {
       setError(validation);
@@ -151,9 +190,24 @@ export default function OnboardingPage() {
     }
     setError('');
     if (step === 'review') {
-      window.localStorage.setItem(profileKey, JSON.stringify({ ...profile, savedAt: new Date().toISOString() }));
-      window.localStorage.removeItem(draftKey);
-      setLocation('/');
+      const input: FinancialProfileInput = {
+        ...profile,
+        bufferPreference: profile.bufferPreference as FinancialProfileInput['bufferPreference'],
+        commitments: profile.commitments.map((commitment) => ({ ...commitment })),
+        goals: profile.goals.map((goal) => ({ ...goal })),
+      };
+      try {
+        await saveProfile.mutateAsync({ data: input });
+        window.localStorage.setItem(profileKey, JSON.stringify({ ...profile, savedAt: new Date().toISOString() }));
+        window.localStorage.removeItem(draftKey);
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: getGetMoneyCalendarQueryKey() }),
+          queryClient.invalidateQueries({ queryKey: getGetFinancialProfileQueryKey() }),
+        ]);
+        setLocation('/');
+      } catch {
+        setError('We could not save your plan yet. Please try again.');
+      }
       return;
     }
     setStep(steps[currentIndex + 1].id);
@@ -301,10 +355,10 @@ export default function OnboardingPage() {
             <button type="button" onClick={back} className="flex min-h-11 items-center gap-2 rounded-full px-2 text-[12px] font-semibold text-[#667085] hover:text-[#003B73]" data-testid="button-onboarding-back"><ArrowLeft className="size-4" /> Back</button>
             <div className="flex items-center gap-2">
               {(step === 'commitments' || step === 'goals') && <button type="button" onClick={skip} className="flex min-h-11 rounded-full px-2 text-[11px] font-semibold text-[#667085] hover:text-[#003B73] sm:px-3" data-testid={`button-skip-${step}`}>I’ll add this later</button>}
-              <button type="button" onClick={next} className="flex min-h-11 items-center gap-2 rounded-full bg-[#003B73] px-5 text-[12px] font-semibold text-white shadow-[0_8px_18px_rgba(0,59,115,.16)] transition-transform hover:-translate-y-0.5" data-testid={step === 'review' ? 'button-finish-onboarding' : 'button-onboarding-continue'}>{step === 'review' ? 'Save and see my Plan' : 'Continue'}<ArrowRight className="size-4" /></button>
+             <button type="button" onClick={next} disabled={saveProfile.isPending} className="flex min-h-11 items-center gap-2 rounded-full bg-[#003B73] px-5 text-[12px] font-semibold text-white shadow-[0_8px_18px_rgba(0,59,115,.16)] transition-transform hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-60" data-testid={step === 'review' ? 'button-finish-onboarding' : 'button-onboarding-continue'}>{saveProfile.isPending ? 'Saving…' : step === 'review' ? 'Save and see my Plan' : 'Continue'}<ArrowRight className="size-4" /></button>
             </div>
           </div>
-          <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-[10px] text-[#98A2B3]"><LockKeyhole className="size-3" /> Saved as a draft on this device as you go.</p>
+           <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-[10px] text-[#98A2B3]"><LockKeyhole className="size-3" /> Your draft stays on this device; the finished plan is saved to Bayzati’s financial record.</p>
         </div>
       </section>
     </div>

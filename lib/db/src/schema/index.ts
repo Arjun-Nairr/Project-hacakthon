@@ -18,3 +18,4 @@
 //   export type Post = typeof postsTable.$inferSelect;
 
 export * from "./financial-imports";
+export * from "./financial-profiles";

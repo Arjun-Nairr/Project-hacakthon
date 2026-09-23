@@ -23,6 +23,8 @@ export interface CalendarEvent {
   amountType: CalendarEventAmountType;
   accountName: string;
   reviewed: boolean;
+  source: string;
+  freshness: Date;
   /** @nullable */
   balanceAfter?: number | null;
   /** @nullable */

@@ -78,6 +78,8 @@ export interface CalendarEvent {
   amountType: CalendarEventAmountType;
   accountName: string;
   reviewed: boolean;
+  source: string;
+  freshness: string;
   /** @nullable */
   balanceAfter?: number | null;
   /** @nullable */
@@ -123,6 +125,147 @@ export interface MoneyCalendar {
   events: CalendarEvent[];
   assumptions: string[];
 }
+
+export type ProfileCommitmentInputConfidence = typeof ProfileCommitmentInputConfidence[keyof typeof ProfileCommitmentInputConfidence];
+
+
+export const ProfileCommitmentInputConfidence = {
+  high: 'high',
+  medium: 'medium',
+  low: 'low',
+} as const;
+
+export interface ProfileCommitmentInput {
+  /** @minLength 1 */
+  name: string;
+  /** @minimum 0 */
+  amount: number;
+  /**
+     * @minimum 1
+     * @maximum 31
+     */
+  day: number;
+  /** @minLength 1 */
+  category: string;
+  confidence: ProfileCommitmentInputConfidence;
+}
+
+export type ProfileGoalInputPriority = typeof ProfileGoalInputPriority[keyof typeof ProfileGoalInputPriority];
+
+
+export const ProfileGoalInputPriority = {
+  high: 'high',
+  medium: 'medium',
+  low: 'low',
+} as const;
+
+export type ProfileGoalInputConfidence = typeof ProfileGoalInputConfidence[keyof typeof ProfileGoalInputConfidence];
+
+
+export const ProfileGoalInputConfidence = {
+  high: 'high',
+  medium: 'medium',
+  low: 'low',
+} as const;
+
+export interface ProfileGoalInput {
+  /** @minLength 1 */
+  name: string;
+  /** @minimum 0 */
+  target: number;
+  /** @pattern ^[0-9]{4}-[0-9]{2}$ */
+  date: string;
+  priority: ProfileGoalInputPriority;
+  confidence?: ProfileGoalInputConfidence;
+}
+
+export type FinancialProfileInputBufferPreference = typeof FinancialProfileInputBufferPreference[keyof typeof FinancialProfileInputBufferPreference];
+
+
+export const FinancialProfileInputBufferPreference = {
+  recommended: 'recommended',
+  custom: 'custom',
+} as const;
+
+export interface FinancialProfileInput {
+  /** @minLength 1 */
+  country: string;
+  /** @minLength 1 */
+  emirate: string;
+  /** @minLength 1 */
+  residency: string;
+  /** @minLength 1 */
+  employment: string;
+  /** @minLength 1 */
+  householdType: string;
+  /** @minimum 1 */
+  adults: number;
+  /** @minimum 0 */
+  dependents: number;
+  /** @exclusiveMinimum 0 */
+  basicSalary: number;
+  /** @minimum 0 */
+  housingAllowance: number;
+  /** @minimum 0 */
+  variableIncome: number;
+  /** @minLength 1 */
+  payFrequency: string;
+  /**
+     * @minimum 1
+     * @maximum 31
+     */
+  payday: number;
+  /** @minimum 0 */
+  availableBalance: number;
+  /** @minLength 1 */
+  mainAccount: string;
+  commitments: ProfileCommitmentInput[];
+  goals: ProfileGoalInput[];
+  bufferPreference: FinancialProfileInputBufferPreference;
+  /** @minimum 0 */
+  bufferAmount: number;
+}
+
+export type ProfileCommitment = ProfileCommitmentInput & {
+  source: string;
+  reviewed: boolean;
+  freshness: string;
+};
+
+export type ProfileGoalConfidence = typeof ProfileGoalConfidence[keyof typeof ProfileGoalConfidence];
+
+
+export const ProfileGoalConfidence = {
+  high: 'high',
+  medium: 'medium',
+  low: 'low',
+} as const;
+
+export type ProfileGoal = ProfileGoalInput & {
+  confidence: ProfileGoalConfidence;
+  source: string;
+  reviewed: boolean;
+  freshness: string;
+};
+
+export type FinancialProfileConfidence = typeof FinancialProfileConfidence[keyof typeof FinancialProfileConfidence];
+
+
+export const FinancialProfileConfidence = {
+  high: 'high',
+  medium: 'medium',
+  low: 'low',
+} as const;
+
+export type FinancialProfile = FinancialProfileInput & {
+  id: string;
+  confidence: FinancialProfileConfidence;
+  source: string;
+  reviewed: boolean;
+  freshness: string;
+  commitments: ProfileCommitment[];
+  goals: ProfileGoal[];
+};
 
 export type ImportSourceType = typeof ImportSourceType[keyof typeof ImportSourceType];
 

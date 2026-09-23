@@ -14,3 +14,9 @@ For document imports, keep file bytes in private App Storage and persist only th
 **Why:** Financial documents need explicit retention and deletion behavior, while review-gated records protect the safe-to-spend view from uncertain or repeated discoveries.
 
 **How to apply:** Keep the import queue and accepted-event projection on the same API contract as Plan and Calendar; accepted records may affect forecasts, while deleted records must be excluded.
+
+Onboarding is another reviewed source in that same layer: persist the normalized household profile, preserve source/confidence/reviewed/freshness metadata, and derive Plan and Calendar events from it rather than from browser-only state.
+
+**Why:** A profile that only exists in local storage cannot keep Safe to Spend consistent across reloads or future data imports.
+
+**How to apply:** Treat the seeded persona as an explicit fallback only when no profile exists; once a profile is saved, all financial views should consume its balance, income, commitments, goals, and buffer inputs.

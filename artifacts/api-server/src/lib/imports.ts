@@ -36,6 +36,8 @@ function toRecord(row: typeof financialImportsTable.$inferSelect): ImportedRecor
       amountType: row.amountType as FinancialEvent["amountType"],
       accountName: row.accountName,
       reviewed: row.reviewed,
+      source: row.sourceName,
+      freshness: row.freshness,
       note: row.note ?? undefined,
     },
     reviewStatus: row.reviewStatus as ImportedRecord["reviewStatus"],
@@ -57,7 +59,7 @@ function toConnection(row: typeof accountConnectionsTable.$inferSelect): Account
   };
 }
 
-function normalizeDocument(input: DocumentImportInput): FinancialEvent {
+function normalizeDocument(input: DocumentImportInput, freshness: Date): FinancialEvent {
   return {
     id: `import-event-${crypto.randomUUID()}`,
     label: input.label.trim(),
@@ -70,6 +72,8 @@ function normalizeDocument(input: DocumentImportInput): FinancialEvent {
     amountType: input.amountType,
     accountName: input.accountName.trim(),
     reviewed: false,
+    source: input.fileName,
+    freshness,
     note: input.note?.trim() || `Imported from ${input.fileName}`,
   };
 }
@@ -99,9 +103,9 @@ export async function listImports() {
 }
 
 export async function createDocumentImport(input: DocumentImportInput): Promise<ImportedRecord> {
-  const event = normalizeDocument(input);
-  const duplicate = await findDuplicate(event);
   const discoveredAt = new Date();
+  const event = normalizeDocument(input, discoveredAt);
+  const duplicate = await findDuplicate(event);
   const row = {
     id: `import-${crypto.randomUUID()}`,
     sourceType: sourceType(input.documentType),
@@ -170,6 +174,8 @@ export async function getAcceptedImportedEvents(): Promise<FinancialEvent[]> {
     amountType: row.amountType as FinancialEvent["amountType"],
     accountName: row.accountName,
     reviewed: row.reviewed,
+    source: row.sourceName,
+    freshness: row.freshness,
     note: row.note ?? undefined,
   }));
 }

@@ -10,10 +10,13 @@ import {
 } from "@workspace/api-zod";
 import {
   calculateFinancialSnapshot,
+  findTightDay,
+  profileToFinancialFacts,
   type FinancialEvent,
   type FinancialFacts,
 } from "../lib/financial-model";
 import { getAcceptedImportedEvents } from "../lib/imports";
+import { getFinancialProfile } from "../lib/profile";
 
 const router: IRouter = Router();
 
@@ -23,9 +26,9 @@ const income = {
   variable: 0,
 };
 
-const recognizedIncome = income.basic + income.housingAllowance * 0.5;
-const existingInstallments = 3_400;
 const bufferTarget = 15_000;
+const seededSource = "seeded-demo";
+const seededFreshness = new Date("2026-09-01T00:00:00.000Z");
 
 const eventDefinitions: FinancialEvent[] = [
   {
@@ -40,6 +43,8 @@ const eventDefinitions: FinancialEvent[] = [
     amountType: "fixed",
     accountName: "Main current account",
     reviewed: true,
+    source: seededSource,
+    freshness: seededFreshness,
     note: "Basic + housing allowance",
   },
   {
@@ -54,6 +59,8 @@ const eventDefinitions: FinancialEvent[] = [
     amountType: "fixed",
     accountName: "Main current account",
     reviewed: true,
+    source: seededSource,
+    freshness: seededFreshness,
     note: "Two-cheque lease",
   },
   {
@@ -68,6 +75,8 @@ const eventDefinitions: FinancialEvent[] = [
     amountType: "fixed",
     accountName: "Main current account",
     reviewed: true,
+    source: seededSource,
+    freshness: seededFreshness,
     note: "Existing instalment",
     isDebtPayment: true,
   },
@@ -83,6 +92,8 @@ const eventDefinitions: FinancialEvent[] = [
     amountType: "fixed",
     accountName: "Main current account",
     reviewed: false,
+    source: seededSource,
+    freshness: seededFreshness,
     note: "Two children · term 1",
   },
   {
@@ -97,6 +108,8 @@ const eventDefinitions: FinancialEvent[] = [
     amountType: "fixed",
     accountName: "Credit card",
     reviewed: true,
+    source: seededSource,
+    freshness: seededFreshness,
     note: "Existing commitment",
     isDebtPayment: true,
   },
@@ -112,6 +125,8 @@ const eventDefinitions: FinancialEvent[] = [
     amountType: "fixed",
     accountName: "Main current account",
     reviewed: false,
+    source: seededSource,
+    freshness: seededFreshness,
     note: "Annual renewal in March",
     isGoalContribution: true,
   },
@@ -127,6 +142,8 @@ const eventDefinitions: FinancialEvent[] = [
     amountType: "fixed",
     accountName: "Main current account",
     reviewed: true,
+    source: seededSource,
+    freshness: seededFreshness,
     note: "Pauseable if needed",
     isGoalContribution: true,
   },
@@ -142,23 +159,37 @@ const baseFinancialFacts: FinancialFacts = {
 };
 
 async function buildCalendar() {
-  const events = [...eventDefinitions, ...(await getAcceptedImportedEvents())].sort((a, b) => a.day - b.day);
-  const financialSnapshot = calculateFinancialSnapshot({ ...baseFinancialFacts, events });
+  const profile = await getFinancialProfile();
+  const baseFacts = profile ? profileToFinancialFacts(profile) : baseFinancialFacts;
+  const events = [...baseFacts.events, ...(await getAcceptedImportedEvents())].sort((a, b) => a.day - b.day);
+  const financialFacts = { ...baseFacts, events };
+  const financialSnapshot = calculateFinancialSnapshot(financialFacts);
+  const monthlyIncome = profile
+    ? profile.basicSalary + profile.housingAllowance + profile.variableIncome
+    : income.basic + income.housingAllowance + income.variable;
   return {
-    persona: "Salaried expat · AED 25k household income",
+    persona: profile
+      ? `${profile.householdType} household · AED ${Math.round(monthlyIncome).toLocaleString()} monthly income`
+      : "Salaried expat · AED 25k household income",
     month: "2026-09",
     monthLabel: "September 2026",
     safeToSpend: financialSnapshot.safeToSpendUntilPayday,
-    projectedPayday: 25,
-    tightDay: 27,
-    bufferTarget,
+    projectedPayday: baseFacts.projectedPayday,
+    tightDay: profile ? findTightDay(financialFacts) : 27,
+    bufferTarget: baseFacts.recommendedEmergencyBuffer,
     financialSnapshot,
-    income,
+    income: profile
+      ? { basic: profile.basicSalary, housingAllowance: profile.housingAllowance, variable: profile.variableIncome }
+      : income,
     events,
     assumptions: [
-      "Current available balance is based on the connected main current account as of 1 September.",
+      profile
+        ? `Available balance is based on ${profile.mainAccount} as entered during setup.`
+        : "Current available balance is based on the connected main current account as of 1 September.",
       "Income, commitments, debt minimums, and goal contributions are separated before the emergency buffer.",
-      "School fees and insurance are forecasted with medium confidence until reviewed.",
+      profile
+        ? "Profile inputs are reviewed by you; confidence still indicates how steady each amount is expected to be."
+        : "School fees and insurance are forecasted with medium confidence until reviewed.",
       ...(events.length > eventDefinitions.length ? ["Accepted imported records are included; new discoveries stay out until reviewed."] : []),
     ],
   };
@@ -180,16 +211,19 @@ async function checkAffordability(input: {
   const fee = input.amount * 0.01;
   const financedAmount = input.amount + (input.financedFee ? fee : 0);
   const installment = monthlyPayment(financedAmount, input.annualRate, input.tenureMonths);
-  const debtRatio = (existingInstallments + installment) / recognizedIncome;
-  const salaryMultiple = input.amount / income.basic;
-  const legalPasses = debtRatio <= 0.5 && salaryMultiple <= 20 && input.tenureMonths <= 48;
   const currentCalendar = await buildCalendar();
+  const planIncome = currentCalendar.income ?? income;
+  const recognizedIncome = planIncome.basic + planIncome.housingAllowance * 0.5;
+  const existingInstallments = currentCalendar.financialSnapshot.minimumDebtPayments;
+  const debtRatio = (existingInstallments + installment) / Math.max(recognizedIncome, 1);
+  const salaryMultiple = input.amount / Math.max(planIncome.basic, 1);
+  const legalPasses = debtRatio <= 0.5 && salaryMultiple <= 20 && input.tenureMonths <= 48;
   const lowestBalance = currentCalendar.safeToSpend - installment;
   const calendarPasses = lowestBalance >= 0;
-  const bufferAfterUpfront = bufferTarget - input.upfrontCash;
-  const monthlyBurn = 8_500 + installment;
+  const bufferAfterUpfront = currentCalendar.bufferTarget - input.upfrontCash;
+  const monthlyBurn = Math.max(currentCalendar.financialSnapshot.billsAndCommitmentsDueBeforeNextPayday, 1) + installment;
   const monthsSurvived = Math.max(0, bufferAfterUpfront / monthlyBurn);
-  const resiliencePasses = bufferAfterUpfront >= bufferTarget && monthsSurvived >= 2;
+  const resiliencePasses = bufferAfterUpfront >= currentCalendar.bufferTarget && monthsSurvived >= 2;
   const maxInstallment = Math.max(0, Math.min(
     recognizedIncome * 0.5 - existingInstallments,
     currentCalendar.safeToSpend,
@@ -221,13 +255,13 @@ async function checkAffordability(input: {
     },
     calendar: {
       passes: calendarPasses,
-      worstMonth: "September · school fees + rent cheque",
+      worstMonth: `${currentCalendar.monthLabel} · tightest planned cash flow`,
       lowestBalance: Math.round(lowestBalance),
     },
     resilience: {
       bufferAfterUpfront: Math.round(bufferAfterUpfront),
       monthsSurvived: Number(monthsSurvived.toFixed(1)),
-      targetBuffer: bufferTarget,
+      targetBuffer: currentCalendar.bufferTarget,
     },
     suggestions,
     assumptions: [

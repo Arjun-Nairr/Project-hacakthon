@@ -115,6 +115,8 @@ export default function CalendarPage() {
       amountType: 'fixed',
       accountName: 'Main current account',
       reviewed: true,
+      source: 'manual',
+      freshness: new Date().toISOString(),
       note: 'Added manually',
     };
     setManualEvents((value) => [...value, event]);

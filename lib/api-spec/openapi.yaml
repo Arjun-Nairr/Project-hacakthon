@@ -14,6 +14,8 @@ tags:
     description: Personal finance calculations
   - name: imports
     description: Read-only account and document imports for the financial plan
+  - name: profile
+    description: Household profile inputs for the financial plan
   - name: Storage
     description: Object storage upload and serving endpoints.
 paths:
@@ -43,6 +45,37 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MoneyCalendar"
+  /profile:
+    get:
+      operationId: getFinancialProfile
+      tags: [profile]
+      summary: Get the saved household profile
+      responses:
+        "200":
+          description: Saved household profile, or null when setup is incomplete
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/FinancialProfile"
+                  - type: "null"
+    put:
+      operationId: saveFinancialProfile
+      tags: [profile]
+      summary: Validate and save the household profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FinancialProfileInput"
+      responses:
+        "200":
+          description: Saved household profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FinancialProfile"
   /imports:
     get:
       operationId: listImports
@@ -218,7 +251,7 @@ components:
         variable: { type: number }
     CalendarEvent:
       type: object
-      required: [id, label, amount, day, kind, paymentType, status, confidence, amountType, accountName, reviewed]
+      required: [id, label, amount, day, kind, paymentType, status, confidence, amountType, accountName, reviewed, source, freshness]
       properties:
         id: { type: string }
         label: { type: string }
@@ -241,6 +274,8 @@ components:
           enum: [fixed, variable, range]
         accountName: { type: string }
         reviewed: { type: boolean }
+        source: { type: string }
+        freshness: { type: string, format: date-time }
         balanceAfter: { type: ["number", "null"] }
         note: { type: ["string", "null"] }
     SafeToSpendScenario:
@@ -287,6 +322,100 @@ components:
         assumptions:
           type: array
           items: { type: string }
+    ProfileCommitmentInput:
+      type: object
+      required: [name, amount, day, category, confidence]
+      properties:
+        name: { type: string, minLength: 1 }
+        amount: { type: number, minimum: 0 }
+        day: { type: integer, minimum: 1, maximum: 31 }
+        category: { type: string, minLength: 1 }
+        confidence:
+          type: string
+          enum: [high, medium, low]
+    ProfileGoalInput:
+      type: object
+      required: [name, target, date, priority]
+      properties:
+        name: { type: string, minLength: 1 }
+        target: { type: number, minimum: 0 }
+        date:
+          type: string
+          pattern: "^[0-9]{4}-[0-9]{2}$"
+        priority:
+          type: string
+          enum: [high, medium, low]
+        confidence:
+          type: string
+          enum: [high, medium, low]
+    FinancialProfileInput:
+      type: object
+      required: [country, emirate, residency, employment, householdType, adults, dependents, basicSalary, housingAllowance, variableIncome, payFrequency, payday, availableBalance, mainAccount, commitments, goals, bufferPreference, bufferAmount]
+      properties:
+        country: { type: string, minLength: 1 }
+        emirate: { type: string, minLength: 1 }
+        residency: { type: string, minLength: 1 }
+        employment: { type: string, minLength: 1 }
+        householdType: { type: string, minLength: 1 }
+        adults: { type: integer, minimum: 1 }
+        dependents: { type: integer, minimum: 0 }
+        basicSalary: { type: number, exclusiveMinimum: 0 }
+        housingAllowance: { type: number, minimum: 0 }
+        variableIncome: { type: number, minimum: 0 }
+        payFrequency: { type: string, minLength: 1 }
+        payday: { type: integer, minimum: 1, maximum: 31 }
+        availableBalance: { type: number, minimum: 0 }
+        mainAccount: { type: string, minLength: 1 }
+        commitments:
+          type: array
+          items: { $ref: "#/components/schemas/ProfileCommitmentInput" }
+        goals:
+          type: array
+          items: { $ref: "#/components/schemas/ProfileGoalInput" }
+        bufferPreference:
+          type: string
+          enum: [recommended, custom]
+        bufferAmount: { type: number, minimum: 0 }
+    ProfileCommitment:
+      allOf:
+        - $ref: "#/components/schemas/ProfileCommitmentInput"
+        - type: object
+          required: [source, reviewed, freshness]
+          properties:
+            source: { type: string }
+            reviewed: { type: boolean }
+            freshness: { type: string, format: date-time }
+    ProfileGoal:
+      allOf:
+        - $ref: "#/components/schemas/ProfileGoalInput"
+        - type: object
+          required: [confidence, source, reviewed, freshness]
+          properties:
+            confidence:
+              type: string
+              enum: [high, medium, low]
+            source: { type: string }
+            reviewed: { type: boolean }
+            freshness: { type: string, format: date-time }
+    FinancialProfile:
+      allOf:
+        - $ref: "#/components/schemas/FinancialProfileInput"
+        - type: object
+          required: [id, confidence, source, reviewed, freshness, commitments, goals]
+          properties:
+            id: { type: string }
+            confidence:
+              type: string
+              enum: [high, medium, low]
+            source: { type: string }
+            reviewed: { type: boolean }
+            freshness: { type: string, format: date-time }
+            commitments:
+              type: array
+              items: { $ref: "#/components/schemas/ProfileCommitment" }
+            goals:
+              type: array
+              items: { $ref: "#/components/schemas/ProfileGoal" }
     ImportSource:
       type: object
       required: [type, name, freshness, retention, deletionState]
