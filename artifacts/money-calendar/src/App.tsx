@@ -11,6 +11,7 @@ import GoalsPage from '@/pages/goals';
 import CalendarPage from '@/pages/calendar';
 import OnboardingPage from '@/pages/onboarding';
 import NotFound from '@/pages/not-found';
+import ImportHub from '@/components/import-hub';
 import {
   Route,
   Switch,
@@ -33,6 +34,7 @@ function Router() {
           <Route path="/home" component={HomePage} />
           <Route path="/goals" component={GoalsPage} />
           <Route path="/calendar" component={CalendarPage} />
+          <Route path="/imports" component={ImportHub} />
           <Route component={NotFound} />
         </Switch>
       </MoneyShell>

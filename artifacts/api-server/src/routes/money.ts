@@ -13,6 +13,7 @@ import {
   type FinancialEvent,
   type FinancialFacts,
 } from "../lib/financial-model";
+import { getAcceptedImportedEvents } from "../lib/imports";
 
 const router: IRouter = Router();
 
@@ -131,7 +132,7 @@ const eventDefinitions: FinancialEvent[] = [
   },
 ];
 
-const financialFacts: FinancialFacts = {
+const baseFinancialFacts: FinancialFacts = {
   asOf: "2026-09-01",
   currency: "AED",
   currentAvailableBalance: 51_450,
@@ -139,25 +140,29 @@ const financialFacts: FinancialFacts = {
   projectedPayday: 25,
   events: eventDefinitions,
 };
-const financialSnapshot = calculateFinancialSnapshot(financialFacts);
 
-const calendar = {
-  persona: "Salaried expat · AED 25k household income",
-  month: "2026-09",
-  monthLabel: "September 2026",
-  safeToSpend: financialSnapshot.safeToSpendUntilPayday,
-  projectedPayday: 25,
-  tightDay: 27,
-  bufferTarget,
-  financialSnapshot,
-  income,
-  events: eventDefinitions,
-  assumptions: [
-    "Current available balance is based on the connected main current account as of 1 September.",
-    "Income, commitments, debt minimums, and goal contributions are separated before the emergency buffer.",
-    "School fees and insurance are forecasted with medium confidence until reviewed.",
-  ],
-};
+async function buildCalendar() {
+  const events = [...eventDefinitions, ...(await getAcceptedImportedEvents())].sort((a, b) => a.day - b.day);
+  const financialSnapshot = calculateFinancialSnapshot({ ...baseFinancialFacts, events });
+  return {
+    persona: "Salaried expat · AED 25k household income",
+    month: "2026-09",
+    monthLabel: "September 2026",
+    safeToSpend: financialSnapshot.safeToSpendUntilPayday,
+    projectedPayday: 25,
+    tightDay: 27,
+    bufferTarget,
+    financialSnapshot,
+    income,
+    events,
+    assumptions: [
+      "Current available balance is based on the connected main current account as of 1 September.",
+      "Income, commitments, debt minimums, and goal contributions are separated before the emergency buffer.",
+      "School fees and insurance are forecasted with medium confidence until reviewed.",
+      ...(events.length > eventDefinitions.length ? ["Accepted imported records are included; new discoveries stay out until reviewed."] : []),
+    ],
+  };
+}
 
 function monthlyPayment(amount: number, annualRate: number, tenureMonths: number) {
   const rate = annualRate / 100 / 12;
@@ -165,7 +170,7 @@ function monthlyPayment(amount: number, annualRate: number, tenureMonths: number
   return (amount * rate * (1 + rate) ** tenureMonths) / ((1 + rate) ** tenureMonths - 1);
 }
 
-function checkAffordability(input: {
+async function checkAffordability(input: {
   amount: number;
   annualRate: number;
   tenureMonths: number;
@@ -178,7 +183,8 @@ function checkAffordability(input: {
   const debtRatio = (existingInstallments + installment) / recognizedIncome;
   const salaryMultiple = input.amount / income.basic;
   const legalPasses = debtRatio <= 0.5 && salaryMultiple <= 20 && input.tenureMonths <= 48;
-  const lowestBalance = calendar.safeToSpend - installment;
+  const currentCalendar = await buildCalendar();
+  const lowestBalance = currentCalendar.safeToSpend - installment;
   const calendarPasses = lowestBalance >= 0;
   const bufferAfterUpfront = bufferTarget - input.upfrontCash;
   const monthlyBurn = 8_500 + installment;
@@ -186,7 +192,7 @@ function checkAffordability(input: {
   const resiliencePasses = bufferAfterUpfront >= bufferTarget && monthsSurvived >= 2;
   const maxInstallment = Math.max(0, Math.min(
     recognizedIncome * 0.5 - existingInstallments,
-    calendar.safeToSpend,
+    currentCalendar.safeToSpend,
   ));
   const passes = legalPasses && calendarPasses && resiliencePasses;
   const verdict = passes ? "fits" : legalPasses && resiliencePasses ? "fits-if" : "doesnt-fit";
@@ -202,7 +208,7 @@ function checkAffordability(input: {
       ? "This clears the legal, calendar, and resilience checks."
       : calendarPasses
         ? "It is legal on paper, but the buffer is too thin for this household."
-        : `Cash goes negative around the ${calendar.tightDay}th in the tight month.`,
+        : `Cash goes negative around the ${currentCalendar.tightDay}th in the tight month.`,
     monthlyInstallment: Math.round(installment),
     maxInstallment: Math.round(maxInstallment),
     legal: {
@@ -232,13 +238,13 @@ function checkAffordability(input: {
   };
 }
 
-router.get("/money-calendar", (_req, res) => {
-  res.json(GetMoneyCalendarResponse.parse(calendar));
+router.get("/money-calendar", async (_req, res): Promise<void> => {
+  res.json(GetMoneyCalendarResponse.parse(await buildCalendar()));
 });
 
-router.post("/affordability", (req, res) => {
+router.post("/affordability", async (req, res): Promise<void> => {
   const input = CheckAffordabilityBody.parse(req.body);
-  res.json(CheckAffordabilityResponse.parse(checkAffordability(input)));
+  res.json(CheckAffordabilityResponse.parse(await checkAffordability(input)));
 });
 
 router.post("/rent-vs-buy", (req, res) => {

@@ -124,6 +124,213 @@ export interface MoneyCalendar {
   assumptions: string[];
 }
 
+export type ImportSourceType = typeof ImportSourceType[keyof typeof ImportSourceType];
+
+
+export const ImportSourceType = {
+  account: 'account',
+  'bank-statement': 'bank-statement',
+  payslip: 'payslip',
+  'credit-card-statement': 'credit-card-statement',
+  'tenancy-contract': 'tenancy-contract',
+  'school-fee-schedule': 'school-fee-schedule',
+} as const;
+
+export type ImportSourceDeletionState = typeof ImportSourceDeletionState[keyof typeof ImportSourceDeletionState];
+
+
+export const ImportSourceDeletionState = {
+  active: 'active',
+  'deletion-requested': 'deletion-requested',
+  deleted: 'deleted',
+} as const;
+
+export interface ImportSource {
+  type: ImportSourceType;
+  name: string;
+  freshness: string;
+  retention: string;
+  deletionState: ImportSourceDeletionState;
+  /** @nullable */
+  objectPath?: string | null;
+}
+
+export type ImportedRecordReviewStatus = typeof ImportedRecordReviewStatus[keyof typeof ImportedRecordReviewStatus];
+
+
+export const ImportedRecordReviewStatus = {
+  'needs-review': 'needs-review',
+  duplicate: 'duplicate',
+  accepted: 'accepted',
+  rejected: 'rejected',
+} as const;
+
+export interface ImportedRecord {
+  id: string;
+  source: ImportSource;
+  event: CalendarEvent;
+  reviewStatus: ImportedRecordReviewStatus;
+  /** @nullable */
+  duplicateOf?: string | null;
+  discoveredAt: string;
+}
+
+export type AccountConnectionAccountType = typeof AccountConnectionAccountType[keyof typeof AccountConnectionAccountType];
+
+
+export const AccountConnectionAccountType = {
+  current: 'current',
+  savings: 'savings',
+  'credit-card': 'credit-card',
+} as const;
+
+export type AccountConnectionPermission = typeof AccountConnectionPermission[keyof typeof AccountConnectionPermission];
+
+
+export const AccountConnectionPermission = {
+  'read-only': 'read-only',
+} as const;
+
+export type AccountConnectionStatus = typeof AccountConnectionStatus[keyof typeof AccountConnectionStatus];
+
+
+export const AccountConnectionStatus = {
+  pending: 'pending',
+  connected: 'connected',
+  disconnected: 'disconnected',
+} as const;
+
+export interface AccountConnection {
+  id: string;
+  institution: string;
+  accountName: string;
+  accountType: AccountConnectionAccountType;
+  permission: AccountConnectionPermission;
+  status: AccountConnectionStatus;
+  connectedAt: string;
+  /** @nullable */
+  lastSyncedAt: string | null;
+}
+
+export interface ImportReviewQueue {
+  records: ImportedRecord[];
+  connections: AccountConnection[];
+}
+
+export type AccountConnectionInputAccountType = typeof AccountConnectionInputAccountType[keyof typeof AccountConnectionInputAccountType];
+
+
+export const AccountConnectionInputAccountType = {
+  current: 'current',
+  savings: 'savings',
+  'credit-card': 'credit-card',
+} as const;
+
+export interface AccountConnectionInput {
+  /** @minLength 1 */
+  institution: string;
+  /** @minLength 1 */
+  accountName: string;
+  accountType: AccountConnectionInputAccountType;
+}
+
+export type DocumentImportInputDocumentType = typeof DocumentImportInputDocumentType[keyof typeof DocumentImportInputDocumentType];
+
+
+export const DocumentImportInputDocumentType = {
+  'bank-statement': 'bank-statement',
+  payslip: 'payslip',
+  'credit-card-statement': 'credit-card-statement',
+  'tenancy-contract': 'tenancy-contract',
+  'school-fee-schedule': 'school-fee-schedule',
+} as const;
+
+export type DocumentImportInputKind = typeof DocumentImportInputKind[keyof typeof DocumentImportInputKind];
+
+
+export const DocumentImportInputKind = {
+  income: 'income',
+  fixed: 'fixed',
+  lump: 'lump',
+  goal: 'goal',
+} as const;
+
+export type DocumentImportInputPaymentType = typeof DocumentImportInputPaymentType[keyof typeof DocumentImportInputPaymentType];
+
+
+export const DocumentImportInputPaymentType = {
+  salary: 'salary',
+  rent: 'rent',
+  loan: 'loan',
+  school: 'school',
+  'credit-card': 'credit-card',
+  insurance: 'insurance',
+  goal: 'goal',
+} as const;
+
+export type DocumentImportInputAmountType = typeof DocumentImportInputAmountType[keyof typeof DocumentImportInputAmountType];
+
+
+export const DocumentImportInputAmountType = {
+  fixed: 'fixed',
+  variable: 'variable',
+  range: 'range',
+} as const;
+
+export interface DocumentImportInput {
+  documentType: DocumentImportInputDocumentType;
+  /** @minLength 1 */
+  fileName: string;
+  /** @minLength 1 */
+  contentType: string;
+  /** @minimum 1 */
+  size: number;
+  /** @minLength 1 */
+  objectPath: string;
+  /** @minLength 1 */
+  label: string;
+  /** @minimum 0 */
+  amount: number;
+  /**
+     * @minimum 1
+     * @maximum 31
+     */
+  day: number;
+  kind: DocumentImportInputKind;
+  paymentType: DocumentImportInputPaymentType;
+  amountType: DocumentImportInputAmountType;
+  /** @minLength 1 */
+  accountName: string;
+  note?: string;
+}
+
+export type ImportReviewInputDecision = typeof ImportReviewInputDecision[keyof typeof ImportReviewInputDecision];
+
+
+export const ImportReviewInputDecision = {
+  accept: 'accept',
+  reject: 'reject',
+} as const;
+
+export interface ImportReviewInput {
+  decision: ImportReviewInputDecision;
+}
+
+export interface UploadUrlRequest {
+  /** @minLength 1 */
+  name: string;
+  /** @minimum 1 */
+  size: number;
+  /** @minLength 1 */
+  contentType: string;
+}
+
+export interface UploadUrlResponse {
+  uploadURL: string;
+  objectPath: string;
+  metadata?: UploadUrlRequest;
+}
+
 export interface AffordabilityInput {
   /** @minimum 0 */
   amount: number;

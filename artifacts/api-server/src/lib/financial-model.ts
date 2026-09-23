@@ -21,6 +21,8 @@ export type FinancialEvent = {
   isGoalContribution?: boolean;
 };
 
+export type ImportedRecordStatus = "needs-review" | "duplicate" | "accepted" | "rejected";
+
 export type FinancialFacts = {
   asOf: string;
   currency: "AED";

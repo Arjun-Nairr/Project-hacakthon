@@ -6,6 +6,12 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './accountConnection';
+export * from './accountConnectionAccountType';
+export * from './accountConnectionInput';
+export * from './accountConnectionInputAccountType';
+export * from './accountConnectionPermission';
+export * from './accountConnectionStatus';
 export * from './affordabilityInput';
 export * from './affordabilityResult';
 export * from './affordabilityResultCalendar';
@@ -18,9 +24,22 @@ export * from './calendarEventConfidence';
 export * from './calendarEventKind';
 export * from './calendarEventPaymentType';
 export * from './calendarEventStatus';
+export * from './documentImportInput';
+export * from './documentImportInputAmountType';
+export * from './documentImportInputDocumentType';
+export * from './documentImportInputKind';
+export * from './documentImportInputPaymentType';
 export * from './financialSnapshot';
 export * from './financialSnapshotCurrency';
 export * from './healthStatus';
+export * from './importedRecord';
+export * from './importedRecordReviewStatus';
+export * from './importReviewInput';
+export * from './importReviewInputDecision';
+export * from './importReviewQueue';
+export * from './importSource';
+export * from './importSourceDeletionState';
+export * from './importSourceType';
 export * from './income';
 export * from './moneyCalendar';
 export * from './rentVsBuyInput';
@@ -30,3 +49,5 @@ export * from './rentVsBuyResultVerdict';
 export * from './safeToSpendScenario';
 export * from './stressInput';
 export * from './stressResult';
+export * from './uploadUrlRequest';
+export * from './uploadUrlResponse';

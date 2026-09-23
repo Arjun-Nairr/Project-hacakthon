@@ -70,6 +70,222 @@ export const GetMoneyCalendarResponse = zod.object({
 
 
 /**
+ * @summary List imported records and sources awaiting review
+ */
+export const ListImportsResponse = zod.object({
+  "records": zod.array(zod.object({
+  "id": zod.string(),
+  "source": zod.object({
+  "type": zod.enum(['account', 'bank-statement', 'payslip', 'credit-card-statement', 'tenancy-contract', 'school-fee-schedule']),
+  "name": zod.string(),
+  "freshness": zod.coerce.date(),
+  "retention": zod.string(),
+  "deletionState": zod.enum(['active', 'deletion-requested', 'deleted']),
+  "objectPath": zod.string().nullish()
+}),
+  "event": zod.object({
+  "id": zod.string(),
+  "label": zod.string(),
+  "amount": zod.number(),
+  "day": zod.number().int(),
+  "kind": zod.enum(['income', 'fixed', 'lump', 'goal']),
+  "paymentType": zod.enum(['salary', 'rent', 'loan', 'school', 'credit-card', 'insurance', 'goal']),
+  "status": zod.enum(['actual', 'forecasted', 'pending', 'overdue']),
+  "confidence": zod.enum(['high', 'medium', 'low']),
+  "amountType": zod.enum(['fixed', 'variable', 'range']),
+  "accountName": zod.string(),
+  "reviewed": zod.boolean(),
+  "balanceAfter": zod.number().nullish(),
+  "note": zod.string().nullish()
+}),
+  "reviewStatus": zod.enum(['needs-review', 'duplicate', 'accepted', 'rejected']),
+  "duplicateOf": zod.string().nullish(),
+  "discoveredAt": zod.coerce.date()
+})),
+  "connections": zod.array(zod.object({
+  "id": zod.string(),
+  "institution": zod.string(),
+  "accountName": zod.string(),
+  "accountType": zod.enum(['current', 'savings', 'credit-card']),
+  "permission": zod.enum(['read-only']),
+  "status": zod.enum(['pending', 'connected', 'disconnected']),
+  "connectedAt": zod.coerce.date(),
+  "lastSyncedAt": zod.coerce.date().nullable()
+}))
+})
+
+
+/**
+ * @summary Start a read-only account connection
+ */
+
+
+
+
+export const StartAccountConnectionBody = zod.object({
+  "institution": zod.string().min(1),
+  "accountName": zod.string().min(1),
+  "accountType": zod.enum(['current', 'savings', 'credit-card'])
+})
+
+export const StartAccountConnectionResponse = zod.object({
+  "id": zod.string(),
+  "institution": zod.string(),
+  "accountName": zod.string(),
+  "accountType": zod.enum(['current', 'savings', 'credit-card']),
+  "permission": zod.enum(['read-only']),
+  "status": zod.enum(['pending', 'connected', 'disconnected']),
+  "connectedAt": zod.coerce.date(),
+  "lastSyncedAt": zod.coerce.date().nullable()
+})
+
+
+/**
+ * @summary Register a supported document for review
+ */
+
+
+
+
+
+export const createDocumentImportBodyAmountMin = 0;
+
+export const createDocumentImportBodyDayMax = 31;
+
+
+
+
+export const CreateDocumentImportBody = zod.object({
+  "documentType": zod.enum(['bank-statement', 'payslip', 'credit-card-statement', 'tenancy-contract', 'school-fee-schedule']),
+  "fileName": zod.string().min(1),
+  "contentType": zod.string().min(1),
+  "size": zod.number().int().min(1),
+  "objectPath": zod.string().min(1),
+  "label": zod.string().min(1),
+  "amount": zod.number().min(createDocumentImportBodyAmountMin),
+  "day": zod.number().int().min(1).max(createDocumentImportBodyDayMax),
+  "kind": zod.enum(['income', 'fixed', 'lump', 'goal']),
+  "paymentType": zod.enum(['salary', 'rent', 'loan', 'school', 'credit-card', 'insurance', 'goal']),
+  "amountType": zod.enum(['fixed', 'variable', 'range']),
+  "accountName": zod.string().min(1),
+  "note": zod.string().optional()
+})
+
+export const CreateDocumentImportResponse = zod.object({
+  "id": zod.string(),
+  "source": zod.object({
+  "type": zod.enum(['account', 'bank-statement', 'payslip', 'credit-card-statement', 'tenancy-contract', 'school-fee-schedule']),
+  "name": zod.string(),
+  "freshness": zod.coerce.date(),
+  "retention": zod.string(),
+  "deletionState": zod.enum(['active', 'deletion-requested', 'deleted']),
+  "objectPath": zod.string().nullish()
+}),
+  "event": zod.object({
+  "id": zod.string(),
+  "label": zod.string(),
+  "amount": zod.number(),
+  "day": zod.number().int(),
+  "kind": zod.enum(['income', 'fixed', 'lump', 'goal']),
+  "paymentType": zod.enum(['salary', 'rent', 'loan', 'school', 'credit-card', 'insurance', 'goal']),
+  "status": zod.enum(['actual', 'forecasted', 'pending', 'overdue']),
+  "confidence": zod.enum(['high', 'medium', 'low']),
+  "amountType": zod.enum(['fixed', 'variable', 'range']),
+  "accountName": zod.string(),
+  "reviewed": zod.boolean(),
+  "balanceAfter": zod.number().nullish(),
+  "note": zod.string().nullish()
+}),
+  "reviewStatus": zod.enum(['needs-review', 'duplicate', 'accepted', 'rejected']),
+  "duplicateOf": zod.string().nullish(),
+  "discoveredAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Accept or reject an imported record
+ */
+export const ReviewImportedRecordParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const ReviewImportedRecordBody = zod.object({
+  "decision": zod.enum(['accept', 'reject'])
+})
+
+export const ReviewImportedRecordResponse = zod.object({
+  "id": zod.string(),
+  "source": zod.object({
+  "type": zod.enum(['account', 'bank-statement', 'payslip', 'credit-card-statement', 'tenancy-contract', 'school-fee-schedule']),
+  "name": zod.string(),
+  "freshness": zod.coerce.date(),
+  "retention": zod.string(),
+  "deletionState": zod.enum(['active', 'deletion-requested', 'deleted']),
+  "objectPath": zod.string().nullish()
+}),
+  "event": zod.object({
+  "id": zod.string(),
+  "label": zod.string(),
+  "amount": zod.number(),
+  "day": zod.number().int(),
+  "kind": zod.enum(['income', 'fixed', 'lump', 'goal']),
+  "paymentType": zod.enum(['salary', 'rent', 'loan', 'school', 'credit-card', 'insurance', 'goal']),
+  "status": zod.enum(['actual', 'forecasted', 'pending', 'overdue']),
+  "confidence": zod.enum(['high', 'medium', 'low']),
+  "amountType": zod.enum(['fixed', 'variable', 'range']),
+  "accountName": zod.string(),
+  "reviewed": zod.boolean(),
+  "balanceAfter": zod.number().nullish(),
+  "note": zod.string().nullish()
+}),
+  "reviewStatus": zod.enum(['needs-review', 'duplicate', 'accepted', 'rejected']),
+  "duplicateOf": zod.string().nullish(),
+  "discoveredAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Delete an imported record and its financial effect
+ */
+export const DeleteImportedRecordParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const DeleteImportedRecordResponse = zod.void()
+
+
+/**
+ * The client sends metadata here, then uploads the file directly to private object storage.
+ * @summary Request a presigned URL for file upload
+ */
+
+
+
+
+
+export const RequestUploadUrlBody = zod.object({
+  "name": zod.string().min(1),
+  "size": zod.number().int().min(1),
+  "contentType": zod.string().min(1)
+})
+
+
+
+
+
+
+export const RequestUploadUrlResponse = zod.object({
+  "uploadURL": zod.string().url(),
+  "objectPath": zod.string(),
+  "metadata": zod.object({
+  "name": zod.string().min(1),
+  "size": zod.number().int().min(1),
+  "contentType": zod.string().min(1)
+}).optional()
+})
+
+
+/**
  * @summary Check a loan against legal, calendar, and resilience rules
  */
 export const checkAffordabilityBodyAmountMin = 0;

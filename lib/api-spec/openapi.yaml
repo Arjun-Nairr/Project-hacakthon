@@ -12,6 +12,10 @@ tags:
     description: Health operations
   - name: money
     description: Personal finance calculations
+  - name: imports
+    description: Read-only account and document imports for the financial plan
+  - name: Storage
+    description: Object storage upload and serving endpoints.
 paths:
   /healthz:
     get:
@@ -39,6 +43,109 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MoneyCalendar"
+  /imports:
+    get:
+      operationId: listImports
+      tags: [imports]
+      summary: List imported records and sources awaiting review
+      responses:
+        "200":
+          description: Import review queue and source state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImportReviewQueue"
+  /imports/account-connections:
+    post:
+      operationId: startAccountConnection
+      tags: [imports]
+      summary: Start a read-only account connection
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AccountConnectionInput"
+      responses:
+        "201":
+          description: Read-only connection started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountConnection"
+  /imports/documents:
+    post:
+      operationId: createDocumentImport
+      tags: [imports]
+      summary: Register a supported document for review
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DocumentImportInput"
+      responses:
+        "201":
+          description: Document import created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImportedRecord"
+  /imports/{id}/review:
+    post:
+      operationId: reviewImportedRecord
+      tags: [imports]
+      summary: Accept or reject an imported record
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ImportReviewInput"
+      responses:
+        "200":
+          description: Reviewed imported record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImportedRecord"
+  /imports/{id}:
+    delete:
+      operationId: deleteImportedRecord
+      tags: [imports]
+      summary: Delete an imported record and its financial effect
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "204":
+          description: Import deleted
+  /storage/uploads/request-url:
+    post:
+      tags: [Storage]
+      operationId: requestUploadUrl
+      summary: Request a presigned URL for file upload
+      description: The client sends metadata here, then uploads the file directly to private object storage.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UploadUrlRequest"
+      responses:
+        "200":
+          description: Presigned upload URL generated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UploadUrlResponse"
   /affordability:
     post:
       operationId: checkAffordability
@@ -180,6 +287,120 @@ components:
         assumptions:
           type: array
           items: { type: string }
+    ImportSource:
+      type: object
+      required: [type, name, freshness, retention, deletionState]
+      properties:
+        type:
+          type: string
+          enum: [account, bank-statement, payslip, credit-card-statement, tenancy-contract, school-fee-schedule]
+        name: { type: string }
+        freshness: { type: string, format: date-time }
+        retention: { type: string }
+        deletionState:
+          type: string
+          enum: [active, deletion-requested, deleted]
+        objectPath: { type: ["string", "null"] }
+    ImportedRecord:
+      type: object
+      required: [id, source, event, reviewStatus, discoveredAt]
+      properties:
+        id: { type: string }
+        source:
+          $ref: "#/components/schemas/ImportSource"
+        event:
+          $ref: "#/components/schemas/CalendarEvent"
+        reviewStatus:
+          type: string
+          enum: [needs-review, duplicate, accepted, rejected]
+        duplicateOf: { type: ["string", "null"] }
+        discoveredAt: { type: string, format: date-time }
+    ImportReviewQueue:
+      type: object
+      required: [records, connections]
+      properties:
+        records:
+          type: array
+          items:
+            $ref: "#/components/schemas/ImportedRecord"
+        connections:
+          type: array
+          items:
+            $ref: "#/components/schemas/AccountConnection"
+    AccountConnectionInput:
+      type: object
+      required: [institution, accountName, accountType]
+      properties:
+        institution: { type: string, minLength: 1 }
+        accountName: { type: string, minLength: 1 }
+        accountType:
+          type: string
+          enum: [current, savings, credit-card]
+    AccountConnection:
+      type: object
+      required: [id, institution, accountName, accountType, permission, status, connectedAt, lastSyncedAt]
+      properties:
+        id: { type: string }
+        institution: { type: string }
+        accountName: { type: string }
+        accountType:
+          type: string
+          enum: [current, savings, credit-card]
+        permission:
+          type: string
+          enum: [read-only]
+        status:
+          type: string
+          enum: [pending, connected, disconnected]
+        connectedAt: { type: string, format: date-time }
+        lastSyncedAt: { type: ["string", "null"], format: date-time }
+    DocumentImportInput:
+      type: object
+      required: [documentType, fileName, contentType, size, objectPath, label, amount, day, kind, paymentType, amountType, accountName]
+      properties:
+        documentType:
+          type: string
+          enum: [bank-statement, payslip, credit-card-statement, tenancy-contract, school-fee-schedule]
+        fileName: { type: string, minLength: 1 }
+        contentType: { type: string, minLength: 1 }
+        size: { type: integer, minimum: 1 }
+        objectPath: { type: string, minLength: 1 }
+        label: { type: string, minLength: 1 }
+        amount: { type: number, minimum: 0 }
+        day: { type: integer, minimum: 1, maximum: 31 }
+        kind:
+          type: string
+          enum: [income, fixed, lump, goal]
+        paymentType:
+          type: string
+          enum: [salary, rent, loan, school, credit-card, insurance, goal]
+        amountType:
+          type: string
+          enum: [fixed, variable, range]
+        accountName: { type: string, minLength: 1 }
+        note: { type: string }
+    ImportReviewInput:
+      type: object
+      required: [decision]
+      properties:
+        decision:
+          type: string
+          enum: [accept, reject]
+    UploadUrlRequest:
+      type: object
+      required: [name, size, contentType]
+      properties:
+        name: { type: string, minLength: 1 }
+        size: { type: integer, minimum: 1 }
+        contentType: { type: string, minLength: 1 }
+    UploadUrlResponse:
+      type: object
+      required: [uploadURL, objectPath]
+      properties:
+        uploadURL: { type: string, format: uri }
+        objectPath: { type: string }
+        metadata:
+          $ref: "#/components/schemas/UploadUrlRequest"
     AffordabilityInput:
       type: object
       required: [amount, annualRate, tenureMonths, upfrontCash]

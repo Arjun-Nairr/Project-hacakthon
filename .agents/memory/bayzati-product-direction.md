@@ -8,3 +8,9 @@ Bayzati should use a hub architecture: accounts, documents, and manual inputs fe
 **Why:** Separate interpretations for calendar, chat, and bank data would create contradictions. The product’s trust depends on showing one consistent financial picture with known, forecasted, pending, uncertain, and user-reviewed information clearly distinguished.
 
 **How to apply:** Build the central financial model and safe-to-spend calculation before adding agent behavior. Treat chat as a later action-and-explanation layer over the same data, with previews and explicit confirmation for any plan change. Prioritize UAE salaried residents and families, read-only imports, documents, recurring-payment review, money timeline, goals, and responsible borrowing comparisons.
+
+For document imports, keep file bytes in private App Storage and persist only the object path plus normalized metadata and review state in PostgreSQL. Do not let pending or duplicate discoveries enter forecast calculations.
+
+**Why:** Financial documents need explicit retention and deletion behavior, while review-gated records protect the safe-to-spend view from uncertain or repeated discoveries.
+
+**How to apply:** Keep the import queue and accepted-event projection on the same API contract as Plan and Calendar; accepted records may affect forecasts, while deleted records must be excluded.

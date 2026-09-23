@@ -20,14 +20,22 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AccountConnection,
+  AccountConnectionInput,
   AffordabilityInput,
   AffordabilityResult,
+  DocumentImportInput,
   HealthStatus,
+  ImportReviewInput,
+  ImportReviewQueue,
+  ImportedRecord,
   MoneyCalendar,
   RentVsBuyInput,
   RentVsBuyResult,
   StressInput,
-  StressResult
+  StressResult,
+  UploadUrlRequest,
+  UploadUrlResponse
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -212,6 +220,511 @@ export function useGetMoneyCalendar<TData = Awaited<ReturnType<typeof getMoneyCa
 
 
 
+
+export const getListImportsUrl = () => {
+
+
+
+
+  return `/api/imports`
+}
+
+/**
+ * @summary List imported records and sources awaiting review
+ */
+export const listImports = async ( options?: Parameters<typeof customFetch>[1]): Promise<ImportReviewQueue> => {
+
+  return customFetch<ImportReviewQueue>(getListImportsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListImportsQueryKey = () => {
+    return [
+    `/api/imports`
+    ] as const;
+    }
+
+
+export const getListImportsQueryOptions = <TData = Awaited<ReturnType<typeof listImports>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listImports>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListImportsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listImports>>> = ({ signal }) => listImports({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listImports>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListImportsQueryResult = NonNullable<Awaited<ReturnType<typeof listImports>>>
+export type ListImportsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List imported records and sources awaiting review
+ */
+
+export function useListImports<TData = Awaited<ReturnType<typeof listImports>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listImports>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListImportsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getStartAccountConnectionUrl = () => {
+
+
+
+
+  return `/api/imports/account-connections`
+}
+
+/**
+ * @summary Start a read-only account connection
+ */
+export const startAccountConnection = async (accountConnectionInput: AccountConnectionInput, options?: Parameters<typeof customFetch>[1]): Promise<AccountConnection> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<AccountConnection>(getStartAccountConnectionUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(accountConnectionInput)
+  }
+);}
+
+
+
+
+
+export const getStartAccountConnectionMutationKey = () => ['startAccountConnection'] as const;
+
+export const getStartAccountConnectionMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startAccountConnection>>, TError,StartAccountConnectionMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof startAccountConnection>>, TError,StartAccountConnectionMutationVariables, TContext> => {
+
+const mutationKey = getStartAccountConnectionMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof startAccountConnection>>, StartAccountConnectionMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  startAccountConnection(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type StartAccountConnectionMutationResult = NonNullable<Awaited<ReturnType<typeof startAccountConnection>>>
+    export type StartAccountConnectionMutationBody = BodyType<AccountConnectionInput>
+    export type StartAccountConnectionMutationError = ErrorType<unknown>
+    export type StartAccountConnectionMutationVariables = {data: BodyType<AccountConnectionInput>}
+
+    /**
+ * @summary Start a read-only account connection
+ */
+export const useStartAccountConnection = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startAccountConnection>>, TError,StartAccountConnectionMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof startAccountConnection>>,
+        TError,
+        StartAccountConnectionMutationVariables,
+        TContext
+      > => {
+      return useMutation(getStartAccountConnectionMutationOptions(options));
+    }
+
+export const getCreateDocumentImportUrl = () => {
+
+
+
+
+  return `/api/imports/documents`
+}
+
+/**
+ * @summary Register a supported document for review
+ */
+export const createDocumentImport = async (documentImportInput: DocumentImportInput, options?: Parameters<typeof customFetch>[1]): Promise<ImportedRecord> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<ImportedRecord>(getCreateDocumentImportUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(documentImportInput)
+  }
+);}
+
+
+
+
+
+export const getCreateDocumentImportMutationKey = () => ['createDocumentImport'] as const;
+
+export const getCreateDocumentImportMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createDocumentImport>>, TError,CreateDocumentImportMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createDocumentImport>>, TError,CreateDocumentImportMutationVariables, TContext> => {
+
+const mutationKey = getCreateDocumentImportMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createDocumentImport>>, CreateDocumentImportMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  createDocumentImport(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateDocumentImportMutationResult = NonNullable<Awaited<ReturnType<typeof createDocumentImport>>>
+    export type CreateDocumentImportMutationBody = BodyType<DocumentImportInput>
+    export type CreateDocumentImportMutationError = ErrorType<unknown>
+    export type CreateDocumentImportMutationVariables = {data: BodyType<DocumentImportInput>}
+
+    /**
+ * @summary Register a supported document for review
+ */
+export const useCreateDocumentImport = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createDocumentImport>>, TError,CreateDocumentImportMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createDocumentImport>>,
+        TError,
+        CreateDocumentImportMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateDocumentImportMutationOptions(options));
+    }
+
+export const getReviewImportedRecordUrl = (id: string,) => {
+
+
+
+
+  return `/api/imports/${id}/review`
+}
+
+/**
+ * @summary Accept or reject an imported record
+ */
+export const reviewImportedRecord = async (id: string,
+    importReviewInput: ImportReviewInput, options?: Parameters<typeof customFetch>[1]): Promise<ImportedRecord> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<ImportedRecord>(getReviewImportedRecordUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(importReviewInput)
+  }
+);}
+
+
+
+
+
+export const getReviewImportedRecordMutationKey = () => ['reviewImportedRecord'] as const;
+
+export const getReviewImportedRecordMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reviewImportedRecord>>, TError,ReviewImportedRecordMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof reviewImportedRecord>>, TError,ReviewImportedRecordMutationVariables, TContext> => {
+
+const mutationKey = getReviewImportedRecordMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof reviewImportedRecord>>, ReviewImportedRecordMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  reviewImportedRecord(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ReviewImportedRecordMutationResult = NonNullable<Awaited<ReturnType<typeof reviewImportedRecord>>>
+    export type ReviewImportedRecordMutationBody = BodyType<ImportReviewInput>
+    export type ReviewImportedRecordMutationError = ErrorType<unknown>
+    export type ReviewImportedRecordMutationVariables = {id: string;data: BodyType<ImportReviewInput>}
+
+    /**
+ * @summary Accept or reject an imported record
+ */
+export const useReviewImportedRecord = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reviewImportedRecord>>, TError,ReviewImportedRecordMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof reviewImportedRecord>>,
+        TError,
+        ReviewImportedRecordMutationVariables,
+        TContext
+      > => {
+      return useMutation(getReviewImportedRecordMutationOptions(options));
+    }
+
+export const getDeleteImportedRecordUrl = (id: string,) => {
+
+
+
+
+  return `/api/imports/${id}`
+}
+
+/**
+ * @summary Delete an imported record and its financial effect
+ */
+export const deleteImportedRecord = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getDeleteImportedRecordUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteImportedRecordMutationKey = () => ['deleteImportedRecord'] as const;
+
+export const getDeleteImportedRecordMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteImportedRecord>>, TError,DeleteImportedRecordMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteImportedRecord>>, TError,DeleteImportedRecordMutationVariables, TContext> => {
+
+const mutationKey = getDeleteImportedRecordMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteImportedRecord>>, DeleteImportedRecordMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteImportedRecord(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteImportedRecordMutationResult = NonNullable<Awaited<ReturnType<typeof deleteImportedRecord>>>
+
+    export type DeleteImportedRecordMutationError = ErrorType<unknown>
+    export type DeleteImportedRecordMutationVariables = {id: string}
+
+    /**
+ * @summary Delete an imported record and its financial effect
+ */
+export const useDeleteImportedRecord = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteImportedRecord>>, TError,DeleteImportedRecordMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteImportedRecord>>,
+        TError,
+        DeleteImportedRecordMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteImportedRecordMutationOptions(options));
+    }
+
+export const getRequestUploadUrlUrl = () => {
+
+
+
+
+  return `/api/storage/uploads/request-url`
+}
+
+/**
+ * The client sends metadata here, then uploads the file directly to private object storage.
+ * @summary Request a presigned URL for file upload
+ */
+export const requestUploadUrl = async (uploadUrlRequest: UploadUrlRequest, options?: Parameters<typeof customFetch>[1]): Promise<UploadUrlResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<UploadUrlResponse>(getRequestUploadUrlUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(uploadUrlRequest)
+  }
+);}
+
+
+
+
+
+export const getRequestUploadUrlMutationKey = () => ['requestUploadUrl'] as const;
+
+export const getRequestUploadUrlMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestUploadUrl>>, TError,RequestUploadUrlMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof requestUploadUrl>>, TError,RequestUploadUrlMutationVariables, TContext> => {
+
+const mutationKey = getRequestUploadUrlMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof requestUploadUrl>>, RequestUploadUrlMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  requestUploadUrl(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RequestUploadUrlMutationResult = NonNullable<Awaited<ReturnType<typeof requestUploadUrl>>>
+    export type RequestUploadUrlMutationBody = BodyType<UploadUrlRequest>
+    export type RequestUploadUrlMutationError = ErrorType<unknown>
+    export type RequestUploadUrlMutationVariables = {data: BodyType<UploadUrlRequest>}
+
+    /**
+ * @summary Request a presigned URL for file upload
+ */
+export const useRequestUploadUrl = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestUploadUrl>>, TError,RequestUploadUrlMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof requestUploadUrl>>,
+        TError,
+        RequestUploadUrlMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRequestUploadUrlMutationOptions(options));
+    }
 
 export const getCheckAffordabilityUrl = () => {
 
